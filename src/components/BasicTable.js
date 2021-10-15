@@ -73,8 +73,8 @@ const BasicTable = () => {
         <div className="w-full h-[91vh] overflow-hidden ag-theme-alpine">
             <AgGridReact
                 defaultColDef={{
-                    // flex: 1,
-                    // minWidth: 150,
+                    flex: 1,
+                    minWidth: 150,
                     filter: true,
                     floatingFilter: true,
                     sortable: true,
