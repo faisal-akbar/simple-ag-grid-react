@@ -39,120 +39,136 @@ const RowGroupTable = () => {
             .then((data) => updateData(data));
     };
 
-    // adds subtotals
-    const groupIncludeFooter = true;
-    // includes grand total
-    const groupIncludeTotalFooter = true;
+    const numberFilterParams = {
+        buttons: ['reset'],
+        defaultOption: 'inRange',
+        alwaysShowBothConditions: false,
+        defaultJoinOperator: 'AND',
+    };
 
     return (
-        <div style={{ width: '100%', height: '100%' }}>
-            <div
-                id="myGrid"
-                style={{
-                    height: '100vh',
-                    width: '100%',
-                    overflow: 'hidden',
+        <div className="w-full h-[91vh] overflow-hidden ag-theme-alpine">
+            <AgGridReact
+                defaultColDef={{
+                    flex: 1,
+                    minWidth: 150,
+                    filter: true,
+                    sortable: true,
+                    resizable: true,
                 }}
-                className="ag-theme-alpine"
-            >
-                <AgGridReact
-                    defaultColDef={{
-                        flex: 1,
-                        minWidth: 150,
-                        filter: true,
-                        sortable: true,
-                        resizable: true,
-                    }}
-                    autoGroupColumnDef={{
-                        headerName: 'Segment',
-                        field: 'Segment',
-                        minWidth: 300,
-                        cellRendererParams: {
-                            footerValueGetter: (params) => {
-                                const isRootLevel = params.node.level === -1;
-                                if (isRootLevel) {
-                                    return 'Grand Total';
-                                }
-                                return `Sub Total (${params.value})`;
-                            },
+                autoGroupColumnDef={{
+                    headerName: 'Segment',
+                    field: 'Segment',
+                    minWidth: 300,
+                    cellRendererParams: {
+                        footerValueGetter: (params) => {
+                            const isRootLevel = params.node.level === -1;
+                            if (isRootLevel) {
+                                return 'Grand Total';
+                            }
+                            return `Sub Total (${params.value})`;
                         },
+                    },
+                }}
+                groupIncludeFooter
+                groupIncludeTotalFooter
+                suppressAggFuncInHeader
+                animateRows
+                sideBar={sideBar}
+                icons={icons}
+                rowGroupPanelShow="always"
+                rowSelection="multiple"
+                rowData={rowData}
+                onGridReady={onGridReady}
+            >
+                <AgGridColumn
+                    headerName="Segment"
+                    field="Segment"
+                    enableRowGroup
+                    rowGroup
+                    hide
+                    filterParams={{ excelMode: 'windows' }}
+                />
+                <AgGridColumn
+                    field="Region"
+                    enableRowGroup
+                    rowGroup
+                    hide
+                    filterParams={{ excelMode: 'windows' }}
+                />
+                <AgGridColumn
+                    field="Category"
+                    enableRowGroup
+                    rowGroup
+                    hide
+                    filterParams={{ excelMode: 'windows' }}
+                />
+                <AgGridColumn
+                    headerName="Sub Category"
+                    field="Sub_Category"
+                    enableRowGroup
+                    rowGroup
+                    hide
+                    filterParams={{ excelMode: 'windows' }}
+                />
+                <AgGridColumn
+                    headerName="Sales"
+                    field="Sales"
+                    // aggFunc="sum"
+                    aggFunc="sum"
+                    enableValue
+                    valueFormatter={currencyFormatter}
+                    // cellClassRules={{
+                    //     'bg-green-500': 'x < 1000',
+                    //     'bg-amber': 'x >= 1000 && x < 2000',
+                    //     'bg-red-400': 'x >= 2000',
+                    // }}
+                    filter="agNumberColumnFilter"
+                    filterParams={numberFilterParams}
+                    valueParser={numberParser}
+
+                    // filterParams={{
+                    //   alwaysShowBothConditions: true,
+                    //   defaultJoinOperator: 'OR',
+                    // }}
+                    // allowedAggFuncs={['sum', 'min', 'max']}
+                />
+
+                <AgGridColumn
+                    field="Quantity"
+                    enableValue
+                    aggFunc="sum"
+                    filter="agNumberColumnFilter"
+                    filterParams={numberFilterParams}
+                    valueParser={numberParser}
+                    // filterParams={{
+                    //   alwaysShowBothConditions: true,
+                    //   defaultJoinOperator: 'OR',
+                    // }}
+                />
+                <AgGridColumn
+                    field="Discount"
+                    aggFunc="avg"
+                    enableValue
+                    filter="agNumberColumnFilter"
+                    filterParams={numberFilterParams}
+                    valueParser={numberParser}
+                    valueFormatter={percentFormatter}
+                />
+                <AgGridColumn
+                    field="Profit"
+                    aggFunc="sum"
+                    enableValue
+                    valueFormatter={currencyFormatter}
+                    filter="agNumberColumnFilter"
+                    filterParams={numberFilterParams}
+                    valueParser={numberParser}
+                    cellClassRules={{
+                        'text-green-500': 'x >= 0',
+                        'text-red-400': 'x < 0',
                     }}
-                    groupIncludeFooter={groupIncludeFooter}
-                    groupIncludeTotalFooter={groupIncludeTotalFooter}
-                    suppressAggFuncInHeader
-                    animateRows
-                    sideBar={sideBar}
-                    icons={icons}
-                    rowGroupPanelShow="always"
-                    rowSelection="multiple"
-                    rowData={rowData}
-                    onGridReady={onGridReady}
-                >
-                    <AgGridColumn
-                        headerName="Segment"
-                        field="Segment"
-                        enableRowGroup
-                        rowGroup
-                        hide
-                    />
-                    <AgGridColumn field="Region" enableRowGroup rowGroup hide />
-                    <AgGridColumn field="Category" enableRowGroup rowGroup hide />
-                    <AgGridColumn field="Sub_Category" enableRowGroup rowGroup hide />
-                    <AgGridColumn
-                        headerName="Sales"
-                        field="Sales"
-                        // aggFunc="sum"
-                        aggFunc="sum"
-                        enableValue
-                        valueFormatter={currencyFormatter}
-                        // cellClassRules={{
-                        //     'bg-green-500': 'x < 1000',
-                        //     'bg-amber': 'x >= 1000 && x < 2000',
-                        //     'bg-red-400': 'x >= 2000',
-                        // }}
-                        filter="agNumberColumnFilter"
-                        valueParser={numberParser}
-
-                        // filterParams={{
-                        //   alwaysShowBothConditions: true,
-                        //   defaultJoinOperator: 'OR',
-                        // }}
-                        // allowedAggFuncs={['sum', 'min', 'max']}
-                    />
-
-                    <AgGridColumn
-                        field="Quantity"
-                        enableValue
-                        aggFunc="sum"
-                        filter="agNumberColumnFilter"
-                        valueParser={numberParser}
-                        // filterParams={{
-                        //   alwaysShowBothConditions: true,
-                        //   defaultJoinOperator: 'OR',
-                        // }}
-                    />
-                    <AgGridColumn
-                        field="Discount"
-                        aggFunc="avg"
-                        enableValue
-                        filter="agNumberColumnFilter"
-                        valueParser={numberParser}
-                        valueFormatter={percentFormatter}
-                    />
-                    <AgGridColumn
-                        field="Profit"
-                        aggFunc="sum"
-                        enableValue
-                        valueFormatter={currencyFormatter}
-                        filter="agNumberColumnFilter"
-                        valueParser={numberParser}
-                        cellClassRules={{
-                            'text-green-500': 'x >= 0',
-                            'text-red-400': 'x < 0',
-                        }}
-                    />
-                </AgGridReact>
-            </div>
+                />
+            </AgGridReact>
         </div>
     );
 };

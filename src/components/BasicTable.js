@@ -69,30 +69,16 @@ const BasicTable = () => {
     };
 
     return (
-        <div className="w-full h-screen overflow-hidden ag-theme-alpine">
+        <div className="w-full h-[91vh] overflow-hidden ag-theme-alpine">
             <AgGridReact
                 defaultColDef={{
-                    flex: 1,
-                    minWidth: 150,
+                    // flex: 1,
+                    // minWidth: 150,
                     filter: true,
                     floatingFilter: true,
                     sortable: true,
                     resizable: true,
                     menuTabs: [],
-                }}
-                autoGroupColumnDef={{
-                    // headerName: 'Segment',
-                    // field: 'Segment',
-                    minWidth: 300,
-                    cellRendererParams: {
-                        footerValueGetter: (params) => {
-                            const isRootLevel = params.node.level === -1;
-                            if (isRootLevel) {
-                                return 'Grand Total';
-                            }
-                            return `Sub Total (${params.value})`;
-                        },
-                    },
                 }}
                 groupIncludeFooter
                 groupIncludeTotalFooter
@@ -108,7 +94,11 @@ const BasicTable = () => {
                     field="Order_ID"
                     filterParams={{ excelMode: 'windows' }}
                 />
-                <AgGridColumn field="Customer_Name" filterParams={{ excelMode: 'windows' }} />
+                <AgGridColumn
+                    headerName="Customer Name"
+                    field="Customer_Name"
+                    filterParams={{ excelMode: 'windows' }}
+                />
                 <AgGridColumn field="Segment" filterParams={{ excelMode: 'windows' }} />
                 <AgGridColumn
                     headerName="Order Date"
