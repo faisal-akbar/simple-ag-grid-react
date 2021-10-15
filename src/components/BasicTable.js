@@ -81,6 +81,7 @@ const BasicTable = () => {
                     resizable: true,
                     menuTabs: [],
                 }}
+                suppressHorizontalScroll
                 groupIncludeFooter
                 groupIncludeTotalFooter
                 animateRows

@@ -71,6 +71,7 @@ const RowGroupTable = () => {
                         },
                     },
                 }}
+                suppressHorizontalScroll
                 groupIncludeFooter
                 groupIncludeTotalFooter
                 suppressAggFuncInHeader
