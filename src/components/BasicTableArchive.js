@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { icons } from '../lib/icons';
 import { currencyFormatter, numberParser, percentFormatter } from '../lib/utils';
 
-const BasicTable = () => {
+const BasicTableArchive = () => {
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState(null);
@@ -40,68 +40,88 @@ const BasicTable = () => {
             .then((data) => updateData(data));
     };
 
-    const dateFilterParams = {
-        buttons: ['reset'],
-        // eslint-disable-next-line consistent-return
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-            const cellDate = moment(cellValue).startOf('day').toDate();
+    // adds subtotals
+    // const groupIncludeFooter = true;
+    // includes grand total
+    // const groupIncludeTotalFooter = true;
 
-            if (filterLocalDateAtMidnight.getTime() === cellDate.getTime()) {
-                return 0;
-            }
-
-            if (cellDate < filterLocalDateAtMidnight) {
-                return -1;
-            }
-
-            if (cellDate > filterLocalDateAtMidnight) {
-                return 1;
-            }
-        },
-        defaultOption: 'inRange',
+    const defaultColDef = {
+        flex: 1,
+        minWidth: 150,
+        filter: true,
+        floatingFilter: true,
+        sortable: true,
+        resizable: true,
+        menuTabs: [],
     };
 
-    const numberFilterParams = {
-        buttons: ['reset'],
-        defaultOption: 'inRange',
-        alwaysShowBothConditions: false,
-        defaultJoinOperator: 'AND',
+    const autoGroupColumnDef = {
+        // headerName: 'Segment',
+        // field: 'Segment',
+        minWidth: 300,
+        cellRendererParams: {
+            footerValueGetter: (params) => {
+                const isRootLevel = params.node.level === -1;
+                if (isRootLevel) {
+                    return 'Grand Total';
+                }
+                return `Sub Total (${params.value})`;
+            },
+        },
+    };
+
+    const columnTypes = {
+        numberColumn: {
+            // width: 150,
+            filter: 'agNumberColumnFilter',
+            filterParams: {
+                buttons: ['reset'],
+                defaultOption: 'inRange',
+                alwaysShowBothConditions: false,
+                defaultJoinOperator: 'AND',
+            },
+        },
+        nonEditableColumn: { editable: false },
+        dateColumn: {
+            filter: 'agDateColumnFilter',
+            filterParams: {
+                buttons: ['reset'],
+                // eslint-disable-next-line consistent-return
+                comparator: (filterLocalDateAtMidnight, cellValue) => {
+                    const cellDate = moment(cellValue).startOf('day').toDate();
+
+                    if (filterLocalDateAtMidnight.getTime() === cellDate.getTime()) {
+                        return 0;
+                    }
+
+                    if (cellDate < filterLocalDateAtMidnight) {
+                        return -1;
+                    }
+
+                    if (cellDate > filterLocalDateAtMidnight) {
+                        return 1;
+                    }
+                },
+                defaultOption: 'inRange',
+            },
+        },
     };
 
     return (
         <div className="w-full h-screen overflow-hidden ag-theme-alpine">
             <AgGridReact
-                defaultColDef={{
-                    flex: 1,
-                    minWidth: 150,
-                    filter: true,
-                    floatingFilter: true,
-                    sortable: true,
-                    resizable: true,
-                    menuTabs: [],
-                }}
-                autoGroupColumnDef={{
-                    // headerName: 'Segment',
-                    // field: 'Segment',
-                    minWidth: 300,
-                    cellRendererParams: {
-                        footerValueGetter: (params) => {
-                            const isRootLevel = params.node.level === -1;
-                            if (isRootLevel) {
-                                return 'Grand Total';
-                            }
-                            return `Sub Total (${params.value})`;
-                        },
-                    },
-                }}
+                defaultColDef={defaultColDef}
+                autoGroupColumnDef={autoGroupColumnDef}
                 groupIncludeFooter
                 groupIncludeTotalFooter
+                suppressAggFuncInHeader
                 animateRows
                 icons={icons}
                 // rowGroupPanelShow="always"
                 rowSelection="multiple"
                 rowData={rowData}
                 onGridReady={onGridReady}
+                columnTypes={columnTypes}
             >
                 <AgGridColumn
                     headerName="Order Id"
@@ -113,53 +133,45 @@ const BasicTable = () => {
                 <AgGridColumn
                     headerName="Order Date"
                     field="Order_Date"
-                    filter="agDateColumnFilter"
-                    filterType="date"
-                    // filterParams={dateFilterParams}
-                    filterParams={dateFilterParams}
+                    type="dateColumn"
                     valueFormatter={(params) => moment(params.value).format('MM/DD/YYYY')}
                 />
                 {/* <AgGridColumn field="Year" filterParams={{ excelMode: 'windows' }} /> */}
                 <AgGridColumn
                     headerName="Ship Date"
                     field="Ship_Date"
-                    filter="agDateColumnFilter"
-                    filterType="date"
-                    filterParams={dateFilterParams}
+                    type="dateColumn"
                     valueFormatter={(params) => moment(params.value).format('MM/DD/YYYY')}
                 />
-
+                {/* <AgGridColumn field="Country_Region" filterParams={{ excelMode: 'windows' }} /> */}
                 <AgGridColumn
                     headerName="Sales"
                     field="Sales"
                     aggFunc="sum"
                     enableValue
-                    filter="agNumberColumnFilter"
-                    filterParams={numberFilterParams}
                     valueFormatter={currencyFormatter}
-                    valueParser={numberParser}
-                    // lowedAggFuncs={['sum', 'min', 'max']}
                     // cellClassRules={{
                     //     'rag-green': 'x < 1000',
                     //     'rag-amber': 'x >= 1000 && x < 2000',
                     //     'rag-red': 'x >= 2000',
                     // }}
+                    type="numberColumn"
+                    valueParser={numberParser}
+                    // allowedAggFuncs={['sum', 'min', 'max']}
                 />
 
                 <AgGridColumn
                     field="Quantity"
                     enableValue
                     aggFunc="sum"
-                    filter="agNumberColumnFilter"
-                    filterParams={numberFilterParams}
+                    type="numberColumn"
                     valueParser={numberParser}
                 />
                 <AgGridColumn
                     field="Discount"
                     aggFunc="avg"
                     enableValue
-                    filter="agNumberColumnFilter"
-                    filterParams={numberFilterParams}
+                    type="numberColumn"
                     valueParser={numberParser}
                     valueFormatter={percentFormatter}
                 />
@@ -167,10 +179,9 @@ const BasicTable = () => {
                     field="Profit"
                     aggFunc="sum"
                     enableValue
-                    filter="agNumberColumnFilter"
-                    filterParams={numberFilterParams}
-                    valueParser={numberParser}
                     valueFormatter={currencyFormatter}
+                    type="numberColumn"
+                    valueParser={numberParser}
                     cellClassRules={{
                         'text-green-500': 'x >= 0',
                         'text-red-400': 'x < 0',
@@ -181,4 +192,4 @@ const BasicTable = () => {
     );
 };
 
-export default BasicTable;
+export default BasicTableArchive;
