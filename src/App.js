@@ -1,13 +1,15 @@
 import './App.css';
-import { GridExample } from './Table';
+import BasicTable from './components/BasicTable';
+import RowGroupTable from './components/RowGroupTable';
 // import { TestExample } from './TestTable';
 
-
 function App() {
-  return (
-    <GridExample/>
-    // <TestExample/>
-  );
+    return (
+        <>
+            <BasicTable />
+            <RowGroupTable />
+        </>
+    );
 }
 
 export default App;
