@@ -9,6 +9,7 @@ import { icons } from '../lib/icons';
 import { currencyFormatter, numberParser, percentFormatter } from '../lib/utils';
 
 const BasicTable = () => {
+    document.title = 'Basic Table - React ag-grid';
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState(null);

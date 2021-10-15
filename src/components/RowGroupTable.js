@@ -9,6 +9,7 @@ import { sideBar } from '../lib/sideBarConfig';
 import { currencyFormatter, numberParser, percentFormatter } from '../lib/utils';
 
 const RowGroupTable = () => {
+    document.title = 'Row Group - React ag-grid';
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState(null);
