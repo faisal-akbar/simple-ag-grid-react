@@ -6,7 +6,7 @@ import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useState } from 'react';
 import { icons } from '../lib/icons';
-import { currencyFormatter, numberParser, percentFormatter } from '../lib/utils';
+import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
 
 const BasicTable = () => {
     document.title = 'Basic Table - React ag-grid';
@@ -145,6 +145,7 @@ const BasicTable = () => {
                     filter="agNumberColumnFilter"
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
+                    valueFormatter={numberFormatter}
                 />
                 <AgGridColumn
                     field="Discount"

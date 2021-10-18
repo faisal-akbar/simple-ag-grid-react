@@ -6,7 +6,7 @@ import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useState } from 'react';
 import { icons } from '../lib/icons';
 import { sideBar } from '../lib/sideBarConfig';
-import { currencyFormatter, numberParser, percentFormatter } from '../lib/utils';
+import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
 
 const RowGroupTable = () => {
     document.title = 'Row Group - React ag-grid';
@@ -143,6 +143,7 @@ const RowGroupTable = () => {
                     filter="agNumberColumnFilter"
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
+                    valueFormatter={numberFormatter}
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
                     //   defaultJoinOperator: 'OR',

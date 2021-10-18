@@ -1,4 +1,8 @@
-const formatNumber = (num, decimal) => Number.parseFloat(num).toFixed(decimal);
+const formatNumber = (num, decimal) =>
+    Number.parseFloat(num)
+        .toFixed(decimal)
+        .toString()
+        .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
 // const formatNumber=(number)=> {
 //     return Math.floor(number)
 //       .toString()
@@ -40,6 +44,13 @@ export const numberParser = (params) => {
 export const percentFormatter = (params) => {
     if (params.value !== undefined) {
         return `${formatNumber(params.value, 3) * 100}%`;
+    }
+    return null;
+};
+
+export const numberFormatter = (params) => {
+    if (params.value !== undefined) {
+        return `${formatNumber(params.value, 0)}`;
     }
     return null;
 };
