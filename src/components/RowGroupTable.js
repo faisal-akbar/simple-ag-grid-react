@@ -82,6 +82,8 @@ const RowGroupTable = () => {
                 rowSelection="multiple"
                 rowData={rowData}
                 onGridReady={onGridReady}
+                enableCharts
+                enableRangeSelection
             >
                 <AgGridColumn
                     headerName="Segment"
@@ -90,6 +92,7 @@ const RowGroupTable = () => {
                     rowGroup
                     hide
                     filterParams={{ excelMode: 'windows' }}
+                    chartDataType="category"
                 />
                 <AgGridColumn
                     field="Region"
@@ -97,6 +100,7 @@ const RowGroupTable = () => {
                     rowGroup
                     hide
                     filterParams={{ excelMode: 'windows' }}
+                    chartDataType="category"
                 />
                 <AgGridColumn
                     field="Category"
@@ -104,6 +108,7 @@ const RowGroupTable = () => {
                     rowGroup
                     hide
                     filterParams={{ excelMode: 'windows' }}
+                    chartDataType="category"
                 />
                 <AgGridColumn
                     headerName="Sub Category"
@@ -112,6 +117,7 @@ const RowGroupTable = () => {
                     rowGroup
                     hide
                     filterParams={{ excelMode: 'windows' }}
+                    chartDataType="category"
                 />
                 <AgGridColumn
                     headerName="Sales"
@@ -128,6 +134,7 @@ const RowGroupTable = () => {
                     filter="agNumberColumnFilter"
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
+                    chartType="series"
 
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
@@ -144,6 +151,7 @@ const RowGroupTable = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     valueFormatter={numberFormatter}
+                    chartType="series"
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
                     //   defaultJoinOperator: 'OR',
@@ -157,6 +165,7 @@ const RowGroupTable = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     valueFormatter={percentFormatter}
+                    chartType="series"
                 />
                 <AgGridColumn
                     field="Profit"
@@ -166,6 +175,7 @@ const RowGroupTable = () => {
                     filter="agNumberColumnFilter"
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
+                    chartType="series"
                     cellClassRules={{
                         'text-green-500': 'x >= 0',
                         'text-red-400': 'x < 0',
