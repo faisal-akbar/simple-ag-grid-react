@@ -1,18 +1,21 @@
 /* eslint-disable no-unused-vars */
 import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { icons } from '../lib/icons';
 import { sideBar } from '../lib/sideBarConfig';
 import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
+import { ThemeContext } from './Theme/ThemeContext';
 
 const RowGroupTable = () => {
     document.title = 'Row Group - React ag-grid';
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState(null);
+    const { theme, setTheme } = useContext(ThemeContext);
 
     const onGridReady = (params) => {
         setGridApi(params.api);
@@ -48,7 +51,13 @@ const RowGroupTable = () => {
     };
 
     return (
-        <div className="w-full h-[91vh] overflow-hidden ag-theme-alpine">
+        <div
+            className={
+                theme === 'dark'
+                    ? 'w-full h-[91vh] overflow-hidden ag-theme-alpine-dark'
+                    : 'w-full h-[91vh] overflow-hidden ag-theme-alpine'
+            }
+        >
             <AgGridReact
                 defaultColDef={{
                     flex: 1,

@@ -1,22 +1,27 @@
 /* eslint-disable no-unused-vars */
 import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { icons } from '../lib/icons';
 import { sideBar } from '../lib/sideBarConfig';
 import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
+import { useAPI } from './Context/apiContext';
+import { ThemeContext } from './Theme/ThemeContext';
 
 const MySQLServerSide = () => {
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
+    const { theme, setTheme } = useContext(ThemeContext);
+    const { isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter } = useAPI();
 
     const datasource = {
         getRows(params) {
             console.log(JSON.stringify(params.request, null, 1));
 
-            const url = 'http://localhost:7000/data';
+            const url = 'http://localhost:8000/data';
             fetch(url, {
                 method: 'post',
                 body: JSON.stringify(params.request),
@@ -40,26 +45,6 @@ const MySQLServerSide = () => {
         params.api.setServerSideDatasource(datasource);
     };
 
-    // Get Filter Value from Database
-    const [segmentFilter, setSegmentFilter] = useState([]);
-    const [regionFilter, setRegionFilter] = useState([]);
-    const [categoryFilter, setCategoryFilter] = useState([]);
-    const [subCategoryFilter, setSubCategoryFilter] = useState([]);
-    useEffect(() => {
-        fetch('http://localhost:7000/filters')
-            .then((res) => res.json())
-            .then((data) => {
-                const segment = data[0].map((item) => item.segment);
-                const region = data[1].map((item) => item.region);
-                const category = data[2].map((item) => item.category);
-                const subCategory = data[3].map((item) => item.sub_category);
-                setSegmentFilter(segment);
-                setRegionFilter(region);
-                setCategoryFilter(category);
-                setSubCategoryFilter(subCategory);
-            });
-    }, []);
-
     const numberFilterParams = {
         buttons: ['reset'],
         defaultOption: 'inRange',
@@ -68,7 +53,13 @@ const MySQLServerSide = () => {
     };
 
     return (
-        <div className="w-full h-[91vh] overflow-hidden ag-theme-alpine">
+        <div
+            className={
+                theme === 'dark'
+                    ? 'w-full h-[91vh] overflow-hidden ag-theme-alpine-dark'
+                    : 'w-full h-[91vh] overflow-hidden ag-theme-alpine'
+            }
+        >
             <AgGridReact
                 defaultColDef={{
                     flex: 1,
@@ -96,7 +87,7 @@ const MySQLServerSide = () => {
                 groupIncludeTotalFooter
                 suppressAggFuncInHeader
                 animateRows
-                sideBar={sideBar}
+                sideBar={!isLoading ? sideBar : null}
                 icons={icons}
                 rowGroupPanelShow="always"
                 rowSelection="multiple"

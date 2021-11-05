@@ -1,3 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 dark:bg-gray-900 transition-colors antialiased;
+  }
+}
+
+@layer utilities {
+  :root {
+    --light-theme-primary-color: rgba(249, 250, 251, 1);
+    --light-theme-secondary-color: rgba(229, 231, 235, 1);
+    --dark-theme-primary-color: rgba(17, 24, 39, 1);
+    --dark-theme-secondary-color: rgba(31, 41, 55, 1);
+  }
+
+  .ag-theme-alpine {
+    --ag-background-color: var(--light-theme-primary-color);
+    --ag-header-background-color: var(--light-theme-primary-color);
+    --ag-subheader-background-color: var(--light-theme-primary-color);
+    --ag-control-panel-background-color: var(--light-theme-primary-color);
+    --ag-border-color: var(--light-theme-secondary-color);
+    --ag-odd-row-background-color: var(--light-theme-secondary-color);
+    --ag-row-border-color: var(--light-theme-secondary-color);
+  }
+  .ag-theme-alpine-dark {
+    --ag-background-color: var(--dark-theme-primary-color);
+    --ag-header-background-color: var(--dark-theme-primary-color);
+    --ag-subheader-background-color: var(--dark-theme-primary-color);
+    --ag-control-panel-background-color: var(--dark-theme-primary-color);
+    --ag-border-color: var(--dark-theme-secondary-color);
+    --ag-odd-row-background-color: var(--dark-theme-secondary-color);
+    --ag-row-border-color: var(--dark-theme-secondary-color);
+  }
+}

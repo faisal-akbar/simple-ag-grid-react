@@ -1,17 +1,20 @@
 /* eslint-disable no-unused-vars */
 import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { icons } from '../lib/icons';
 import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
+import { ThemeContext } from './Theme/ThemeContext';
 
 const BasicTable = () => {
     document.title = 'Basic Table - React ag-grid';
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState(null);
+    const { theme, setTheme } = useContext(ThemeContext);
 
     const onGridReady = (params) => {
         setGridApi(params.api);
@@ -69,7 +72,13 @@ const BasicTable = () => {
     };
 
     return (
-        <div className="w-full h-[91vh] overflow-hidden ag-theme-alpine">
+        <div
+            className={
+                theme === 'dark'
+                    ? 'w-full h-[91vh] overflow-hidden ag-theme-alpine-dark'
+                    : 'w-full h-[91vh] overflow-hidden ag-theme-alpine'
+            }
+        >
             <AgGridReact
                 defaultColDef={{
                     flex: 1,

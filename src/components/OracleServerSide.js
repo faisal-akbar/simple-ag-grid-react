@@ -1,17 +1,22 @@
 /* eslint-disable no-unused-vars */
 import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { icons } from '../lib/icons';
 import { sideBar } from '../lib/sideBarConfig';
 import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
+import { useAPI } from './Context/apiContext';
+import { ThemeContext } from './Theme/ThemeContext';
 
 const OracleServerSide = () => {
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState(null);
+    const { theme, setTheme } = useContext(ThemeContext);
+    const { isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter } = useAPI();
 
     const datasource = {
         getRows(params) {
@@ -42,25 +47,6 @@ const OracleServerSide = () => {
         params.api.setServerSideDatasource(datasource);
     };
 
-    const [segmentFilter, setSegmentFilter] = useState([]);
-    const [regionFilter, setRegionFilter] = useState([]);
-    const [categoryFilter, setCategoryFilter] = useState([]);
-    const [subCategoryFilter, setSubCategoryFilter] = useState([]);
-    useEffect(() => {
-        fetch('http://localhost:8000/filters')
-            .then((res) => res.json())
-            .then((data) => {
-                const segment = data[0].map((item) => item.SEGMENT);
-                const region = data[1].map((item) => item.REGION);
-                const category = data[2].map((item) => item.CATEGORY);
-                const subCategory = data[3].map((item) => item.SUB_CATEGORY);
-                setSegmentFilter(segment);
-                setRegionFilter(region);
-                setCategoryFilter(category);
-                setSubCategoryFilter(subCategory);
-            });
-    }, []);
-
     const numberFilterParams = {
         buttons: ['reset'],
         defaultOption: 'inRange',
@@ -68,7 +54,13 @@ const OracleServerSide = () => {
         defaultJoinOperator: 'AND',
     };
     return (
-        <div className="w-full h-[91vh] overflow-hidden ag-theme-alpine">
+        <div
+            className={
+                theme === 'dark'
+                    ? 'w-full h-[91vh] overflow-hidden ag-theme-alpine-dark'
+                    : 'w-full h-[91vh] overflow-hidden ag-theme-alpine'
+            }
+        >
             <AgGridReact
                 defaultColDef={{
                     flex: 1,
@@ -96,7 +88,7 @@ const OracleServerSide = () => {
                 groupIncludeTotalFooter
                 suppressAggFuncInHeader
                 animateRows
-                sideBar={sideBar}
+                sideBar={!isLoading ? sideBar : null}
                 icons={icons}
                 rowGroupPanelShow="always"
                 rowSelection="multiple"
@@ -117,6 +109,7 @@ const OracleServerSide = () => {
                 // }}
             >
                 {/* <AgGridColumn field="DATE" /> */}
+                {/* <AgGridColumn field="SEGMENT" filter="agTextColumnFilter" /> */}
                 <AgGridColumn
                     headerName="Segment"
                     field="SEGMENT"
@@ -127,6 +120,7 @@ const OracleServerSide = () => {
                     chartDataType="category"
                 />
                 <AgGridColumn
+                    headerName="Region"
                     field="REGION"
                     enableRowGroup
                     rowGroup
@@ -135,6 +129,7 @@ const OracleServerSide = () => {
                     chartDataType="category"
                 />
                 <AgGridColumn
+                    headerName="Category"
                     field="CATEGORY"
                     enableRowGroup
                     rowGroup
@@ -176,6 +171,7 @@ const OracleServerSide = () => {
                 />
 
                 <AgGridColumn
+                    headerName="Quantity"
                     field="QUANTITY"
                     enableValue
                     aggFunc="sum"
@@ -190,6 +186,7 @@ const OracleServerSide = () => {
                     // }}
                 />
                 <AgGridColumn
+                    headerName="Discount"
                     field="DISCOUNT"
                     aggFunc="avg"
                     enableValue
@@ -200,6 +197,7 @@ const OracleServerSide = () => {
                     chartType="series"
                 />
                 <AgGridColumn
+                    headerName="Profit"
                     field="PROFIT"
                     aggFunc="sum"
                     enableValue
