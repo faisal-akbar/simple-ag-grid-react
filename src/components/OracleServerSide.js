@@ -1,9 +1,11 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable no-unused-vars */
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
+import moment from 'moment';
 import React, { useContext, useState } from 'react';
 import { icons } from '../lib/icons';
 import { sideBar } from '../lib/sideBarConfig';
@@ -25,13 +27,31 @@ const OracleServerSide = () => {
             fetch(url, {
                 method: 'post',
                 body: JSON.stringify(params.request),
-                headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
             })
                 .then((httpResponse) => httpResponse.json())
                 .then((response) => {
-                    console.log('In POST', response.rows);
-                    console.log('In POST', response.lastRow);
-                    params.successCallback(response.rows, response.lastRow);
+                    console.log('In POST', response);
+                    // console.log('In POST', response.lastRow);
+                    // =========THIS CODE IS FOR HANDLING DATE IN ROW GROUP==============
+                    const exists =
+                        response.rows.filter((o) => o.hasOwnProperty('ORDER_DATE')).length > 0;
+                    console.log('exists', exists);
+                    if (exists) {
+                        const newRows = response.rows.map((d) => {
+                            const properties = {
+                                ...d,
+                                ORDER_DATE: moment(d.ORDER_DATE).format('DD-MMM-YY'),
+                            };
+                            return properties;
+                        });
+
+                        return params.successCallback(newRows, response.lastRow);
+                    }
+                    // ==================================================================
+                    return params.successCallback(response.rows, response.lastRow);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -48,10 +68,31 @@ const OracleServerSide = () => {
     };
 
     const numberFilterParams = {
-        buttons: ['reset'],
+        buttons: ['apply', 'reset'],
         defaultOption: 'inRange',
         alwaysShowBothConditions: false,
         defaultJoinOperator: 'AND',
+    };
+
+    const dateFilterParams = {
+        buttons: ['apply', 'reset'],
+        // eslint-disable-next-line consistent-return
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+            const cellDate = moment(cellValue).startOf('day').toDate();
+
+            if (filterLocalDateAtMidnight.getTime() === cellDate.getTime()) {
+                return 0;
+            }
+
+            if (cellDate < filterLocalDateAtMidnight) {
+                return -1;
+            }
+
+            if (cellDate > filterLocalDateAtMidnight) {
+                return 1;
+            }
+        },
+        defaultOption: 'inRange',
     };
     return (
         <div
@@ -110,13 +151,14 @@ const OracleServerSide = () => {
             >
                 {/* <AgGridColumn field="DATE" /> */}
                 {/* <AgGridColumn field="SEGMENT" filter="agTextColumnFilter" /> */}
+
                 <AgGridColumn
                     headerName="Segment"
                     field="SEGMENT"
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ values: segmentFilter, excelMode: 'windows' }}
+                    filterParams={{ values: segmentFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
@@ -125,7 +167,7 @@ const OracleServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ values: regionFilter, excelMode: 'windows' }}
+                    filterParams={{ values: regionFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
@@ -134,7 +176,7 @@ const OracleServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ values: categoryFilter, excelMode: 'windows' }}
+                    filterParams={{ values: categoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
@@ -143,8 +185,20 @@ const OracleServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ values: subCategoryFilter, excelMode: 'windows' }}
+                    filterParams={{ values: subCategoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
+                />
+                <AgGridColumn
+                    headerName="Order Date"
+                    field="ORDER_DATE"
+                    filter="agDateColumnFilter"
+                    filterType="date"
+                    enableRowGroup
+                    rowGroup
+                    hide
+                    // filterParams={dateFilterParams}
+                    filterParams={dateFilterParams}
+                    valueFormatter={(params) => moment(params.value).format('MM/DD/YYYY')}
                 />
                 <AgGridColumn
                     headerName="Sales"

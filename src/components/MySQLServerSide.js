@@ -4,6 +4,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
+import moment from 'moment';
 import React, { useContext, useState } from 'react';
 import { icons } from '../lib/icons';
 import { sideBar } from '../lib/sideBarConfig';
@@ -46,10 +47,31 @@ const MySQLServerSide = () => {
     };
 
     const numberFilterParams = {
-        buttons: ['reset'],
+        buttons: ['apply', 'reset'],
         defaultOption: 'inRange',
         alwaysShowBothConditions: false,
         defaultJoinOperator: 'AND',
+    };
+
+    const dateFilterParams = {
+        buttons: ['apply', 'reset'],
+        // eslint-disable-next-line consistent-return
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+            const cellDate = moment(cellValue).startOf('day').toDate();
+
+            if (filterLocalDateAtMidnight.getTime() === cellDate.getTime()) {
+                return 0;
+            }
+
+            if (cellDate < filterLocalDateAtMidnight) {
+                return -1;
+            }
+
+            if (cellDate > filterLocalDateAtMidnight) {
+                return 1;
+            }
+        },
+        defaultOption: 'inRange',
     };
 
     return (
@@ -114,23 +136,25 @@ const MySQLServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ values: segmentFilter, excelMode: 'windows' }}
+                    filterParams={{ values: segmentFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
+                    headerName="Region"
                     field="region"
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ values: regionFilter, excelMode: 'windows' }}
+                    filterParams={{ values: regionFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
+                    headerName="Category"
                     field="category"
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ values: categoryFilter, excelMode: 'windows' }}
+                    filterParams={{ values: categoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
@@ -139,7 +163,7 @@ const MySQLServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ values: subCategoryFilter, excelMode: 'windows' }}
+                    filterParams={{ values: subCategoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
@@ -165,8 +189,21 @@ const MySQLServerSide = () => {
                     // }}
                     // allowedAggFuncs={['sum', 'min', 'max']}
                 />
+                <AgGridColumn
+                    headerName="Order Date"
+                    field="order_date"
+                    filter="agDateColumnFilter"
+                    filterType="date"
+                    enableRowGroup
+                    rowGroup
+                    hide
+                    // filterParams={dateFilterParams}
+                    filterParams={dateFilterParams}
+                    valueFormatter={(params) => moment(params.value).format('MM/DD/YYYY')}
+                />
 
                 <AgGridColumn
+                    headerName="Quantity"
                     field="quantity"
                     enableValue
                     aggFunc="sum"
@@ -181,6 +218,7 @@ const MySQLServerSide = () => {
                     // }}
                 />
                 <AgGridColumn
+                    headerName="Discount"
                     field="discount"
                     aggFunc="avg"
                     enableValue
@@ -191,6 +229,7 @@ const MySQLServerSide = () => {
                     chartType="series"
                 />
                 <AgGridColumn
+                    headerName="Profit"
                     field="profit"
                     aggFunc="sum"
                     enableValue

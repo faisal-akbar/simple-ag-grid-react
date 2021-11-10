@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './App.css';
 import BasicTable from './components/BasicTable';
 import APIContextProvider from './components/Context/apiContext';
-import Header from './components/Header';
+import Layout from './components/Layout';
 import MySQLServerSide from './components/MySQLServerSide';
 import OlympicServerSide from './components/Olympic';
 import OracleServerSide from './components/OracleServerSide';
@@ -13,29 +13,26 @@ function App() {
         <>
             <Router>
                 <APIContextProvider>
-                    <Switch>
-                        <Route exact path="/">
-                            <Header />
-                            <BasicTable />
-                        </Route>
+                    <Layout>
+                        <Switch>
+                            <Route exact path="/">
+                                <BasicTable />
+                            </Route>
 
-                        <Route exact path="/row-group-table">
-                            <Header />
-                            <RowGroupTable />
-                        </Route>
-                        <Route exact path="/mysql-ssrm">
-                            <Header />
-                            <MySQLServerSide />
-                        </Route>
-                        <Route exact path="/oracle-ssrm">
-                            <Header />
-                            <OracleServerSide />
-                        </Route>
-                        <Route exact path="/olympic">
-                            <Header />
-                            <OlympicServerSide />
-                        </Route>
-                    </Switch>
+                            <Route exact path="/row-group-table">
+                                <RowGroupTable />
+                            </Route>
+                            <Route exact path="/mysql-ssrm">
+                                <MySQLServerSide />
+                            </Route>
+                            <Route exact path="/oracle-ssrm">
+                                <OracleServerSide />
+                            </Route>
+                            <Route exact path="/olympic">
+                                <OlympicServerSide />
+                            </Route>
+                        </Switch>
+                    </Layout>
                 </APIContextProvider>
             </Router>
         </>

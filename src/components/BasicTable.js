@@ -26,11 +26,11 @@ const BasicTable = () => {
                     ...d,
                     // Order_Date: moment(d.Order_Date).format('YYYY-MM-DD'),
                     // Ship_Date: moment(d.Ship_Date).format('YYYY-MM-DD'),
-                    Year: d.Order_Date.slice(-4),
-                    Sales: +d.Sales,
-                    Quantity: +d.Quantity,
-                    Discount: +d.Discount,
-                    Profit: +d.Profit,
+                    year: d.order_date.slice(-4),
+                    sales: +d.sales,
+                    quantity: +d.quantity,
+                    discount: +d.discount,
+                    profit: +d.profit,
                 };
                 return properties;
             });
@@ -38,13 +38,13 @@ const BasicTable = () => {
             setRowData(newData);
         };
 
-        fetch('data/superstore_data.json')
+        fetch('data/superstore.json')
             .then((resp) => resp.json())
             .then((data) => updateData(data));
     };
 
     const dateFilterParams = {
-        buttons: ['reset'],
+        buttons: ['apply', 'reset'],
         // eslint-disable-next-line consistent-return
         comparator: (filterLocalDateAtMidnight, cellValue) => {
             const cellDate = moment(cellValue).startOf('day').toDate();
@@ -65,7 +65,7 @@ const BasicTable = () => {
     };
 
     const numberFilterParams = {
-        buttons: ['reset'],
+        buttons: ['apply', 'reset'],
         defaultOption: 'inRange',
         alwaysShowBothConditions: false,
         defaultJoinOperator: 'AND',
@@ -101,18 +101,22 @@ const BasicTable = () => {
             >
                 <AgGridColumn
                     headerName="Order Id"
-                    field="Order_ID"
-                    filterParams={{ excelMode: 'windows' }}
+                    field="order_id"
+                    filterParams={{ buttons: ['apply', 'reset'] }}
                 />
                 <AgGridColumn
                     headerName="Customer Name"
-                    field="Customer_Name"
-                    filterParams={{ excelMode: 'windows' }}
+                    field="customer_name"
+                    filterParams={{ buttons: ['apply', 'reset'] }}
                 />
-                <AgGridColumn field="Segment" filterParams={{ excelMode: 'windows' }} />
+                <AgGridColumn
+                    headerName="Segment"
+                    field="segment"
+                    filterParams={{ buttons: ['apply', 'reset'] }}
+                />
                 <AgGridColumn
                     headerName="Order Date"
-                    field="Order_Date"
+                    field="order_date"
                     filter="agDateColumnFilter"
                     filterType="date"
                     // filterParams={dateFilterParams}
@@ -122,7 +126,7 @@ const BasicTable = () => {
                 {/* <AgGridColumn field="Year" filterParams={{ excelMode: 'windows' }} /> */}
                 <AgGridColumn
                     headerName="Ship Date"
-                    field="Ship_Date"
+                    field="ship_date"
                     filter="agDateColumnFilter"
                     filterType="date"
                     filterParams={dateFilterParams}
@@ -131,7 +135,7 @@ const BasicTable = () => {
 
                 <AgGridColumn
                     headerName="Sales"
-                    field="Sales"
+                    field="sales"
                     aggFunc="sum"
                     enableValue
                     filter="agNumberColumnFilter"
@@ -147,7 +151,8 @@ const BasicTable = () => {
                 />
 
                 <AgGridColumn
-                    field="Quantity"
+                    headerName="Quantity"
+                    field="quantity"
                     enableValue
                     aggFunc="sum"
                     filter="agNumberColumnFilter"
@@ -156,7 +161,8 @@ const BasicTable = () => {
                     valueFormatter={numberFormatter}
                 />
                 <AgGridColumn
-                    field="Discount"
+                    headerName="Discount"
+                    field="discount"
                     aggFunc="avg"
                     enableValue
                     filter="agNumberColumnFilter"
@@ -165,7 +171,8 @@ const BasicTable = () => {
                     valueFormatter={percentFormatter}
                 />
                 <AgGridColumn
-                    field="Profit"
+                    headerName="Profit"
+                    field="profit"
                     aggFunc="sum"
                     enableValue
                     filter="agNumberColumnFilter"

@@ -4,6 +4,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
+import moment from 'moment';
 import React, { useContext, useState } from 'react';
 import { icons } from '../lib/icons';
 import { sideBar } from '../lib/sideBarConfig';
@@ -27,27 +28,48 @@ const RowGroupTable = () => {
                     ...d,
                     // Order_Date: moment(d.Order_Date).format('YYYY-MM-DD'),
                     // Ship_Date: moment(d.Ship_Date).format('YYYY-MM-DD'),
-                    Year: d.Order_Date.slice(-4),
-                    Sales: +d.Sales,
-                    Quantity: +d.Quantity,
-                    Discount: +d.Discount,
-                    Profit: +d.Profit,
+                    year: d.order_date.slice(-4),
+                    sales: +d.sales,
+                    quantity: +d.quantity,
+                    discount: +d.discount,
+                    profit: +d.profit,
                 };
                 return properties;
             });
             setRowData(newData);
         };
 
-        fetch('data/superstore_data.json')
+        fetch('data/superstore.json')
             .then((resp) => resp.json())
             .then((data) => updateData(data));
     };
 
     const numberFilterParams = {
-        buttons: ['reset'],
+        buttons: ['apply', 'reset'],
         defaultOption: 'inRange',
         alwaysShowBothConditions: false,
         defaultJoinOperator: 'AND',
+    };
+
+    const dateFilterParams = {
+        buttons: ['apply', 'reset'],
+        // eslint-disable-next-line consistent-return
+        comparator: (filterLocalDateAtMidnight, cellValue) => {
+            const cellDate = moment(cellValue).startOf('day').toDate();
+
+            if (filterLocalDateAtMidnight.getTime() === cellDate.getTime()) {
+                return 0;
+            }
+
+            if (cellDate < filterLocalDateAtMidnight) {
+                return -1;
+            }
+
+            if (cellDate > filterLocalDateAtMidnight) {
+                return 1;
+            }
+        },
+        defaultOption: 'inRange',
     };
 
     return (
@@ -68,7 +90,7 @@ const RowGroupTable = () => {
                 }}
                 autoGroupColumnDef={{
                     headerName: 'Segment',
-                    field: 'Segment',
+                    // field: 'segment',
                     minWidth: 300,
                     cellRendererParams: {
                         footerValueGetter: (params) => {
@@ -96,41 +118,55 @@ const RowGroupTable = () => {
             >
                 <AgGridColumn
                     headerName="Segment"
-                    field="Segment"
+                    field="segment"
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ excelMode: 'windows' }}
+                    filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
-                    field="Region"
+                    headerName="Region"
+                    field="region"
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ excelMode: 'windows' }}
+                    filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
-                    field="Category"
+                    headerName="Category"
+                    field="category"
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ excelMode: 'windows' }}
+                    filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
                     headerName="Sub Category"
-                    field="Sub_Category"
+                    field="sub_category"
                     enableRowGroup
                     rowGroup
                     hide
-                    filterParams={{ excelMode: 'windows' }}
+                    filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
+                    headerName="Order Date"
+                    field="order_date"
+                    filter="agDateColumnFilter"
+                    filterType="date"
+                    enableRowGroup
+                    rowGroup
+                    hide
+                    // filterParams={dateFilterParams}
+                    filterParams={dateFilterParams}
+                    valueFormatter={(params) => moment(params.value).format('MM/DD/YYYY')}
+                />
+                <AgGridColumn
                     headerName="Sales"
-                    field="Sales"
+                    field="sales"
                     // aggFunc="sum"
                     aggFunc="sum"
                     enableValue
@@ -153,7 +189,8 @@ const RowGroupTable = () => {
                 />
 
                 <AgGridColumn
-                    field="Quantity"
+                    headerName="Quantity"
+                    field="quantity"
                     enableValue
                     aggFunc="sum"
                     filter="agNumberColumnFilter"
@@ -167,7 +204,8 @@ const RowGroupTable = () => {
                     // }}
                 />
                 <AgGridColumn
-                    field="Discount"
+                    headerName="Discount"
+                    field="discount"
                     aggFunc="avg"
                     enableValue
                     filter="agNumberColumnFilter"
@@ -177,7 +215,8 @@ const RowGroupTable = () => {
                     chartType="series"
                 />
                 <AgGridColumn
-                    field="Profit"
+                    headerName="Profit"
+                    field="profit"
                     aggFunc="sum"
                     enableValue
                     valueFormatter={currencyFormatter}
