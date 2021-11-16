@@ -102,16 +102,19 @@ const BasicTable = () => {
                 <AgGridColumn
                     headerName="Order Id"
                     field="order_id"
+                    filter="agTextColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                 />
                 <AgGridColumn
                     headerName="Customer Name"
                     field="customer_name"
+                    filter="agTextColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                 />
                 <AgGridColumn
                     headerName="Segment"
                     field="segment"
+                    filter="agSetColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                 />
                 <AgGridColumn
@@ -121,7 +124,9 @@ const BasicTable = () => {
                     filterType="date"
                     // filterParams={dateFilterParams}
                     filterParams={dateFilterParams}
-                    valueFormatter={(params) => moment(params.value).format('MM/DD/YYYY')}
+                    valueFormatter={(params) =>
+                        params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''
+                    }
                 />
                 {/* <AgGridColumn field="Year" filterParams={{ excelMode: 'windows' }} /> */}
                 <AgGridColumn

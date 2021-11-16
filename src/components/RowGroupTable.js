@@ -122,6 +122,7 @@ const RowGroupTable = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -131,6 +132,7 @@ const RowGroupTable = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -140,6 +142,7 @@ const RowGroupTable = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -149,6 +152,7 @@ const RowGroupTable = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -162,7 +166,17 @@ const RowGroupTable = () => {
                     hide
                     // filterParams={dateFilterParams}
                     filterParams={dateFilterParams}
-                    valueFormatter={(params) => moment(params.value).format('MM/DD/YYYY')}
+                    valueFormatter={(params) =>
+                        params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''
+                    }
+                />
+                <AgGridColumn
+                    headerName="Order Id"
+                    field="order_id"
+                    filter="agTextColumnFilter"
+                    enableRowGroup
+                    hide
+                    filterParams={{ buttons: ['apply', 'reset'] }}
                 />
                 <AgGridColumn
                     headerName="Sales"

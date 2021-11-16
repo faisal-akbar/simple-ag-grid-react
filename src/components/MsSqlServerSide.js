@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable no-unused-vars */
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
@@ -12,7 +13,7 @@ import { currencyFormatter, numberFormatter, numberParser, percentFormatter } fr
 import { useAPI } from './Context/apiContext';
 import { ThemeContext } from './Theme/ThemeContext';
 
-const MySQLServerSide = () => {
+const MsSqlServerSide = () => {
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const { theme, setTheme } = useContext(ThemeContext);
@@ -31,7 +32,23 @@ const MySQLServerSide = () => {
                 .then((httpResponse) => httpResponse.json())
                 .then((response) => {
                     console.log('In POST', response);
-                    params.successCallback(response.rows, response.lastRow);
+                    // =========THIS CODE IS FOR HANDLING DATE IN ROW GROUP==============
+                    const exists =
+                        response.rows.filter((o) => o.hasOwnProperty('order_date')).length > 0;
+                    console.log('exists', exists);
+                    if (exists) {
+                        const newRows = response.rows.map((d) => {
+                            const properties = {
+                                ...d,
+                                order_date: d.order_date.slice(0, 10),
+                            };
+                            return properties;
+                        });
+
+                        return params.successCallback(newRows, response.lastRow);
+                    }
+                    // ==================================================================
+                    return params.successCallback(response.rows, response.lastRow);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -119,6 +136,7 @@ const MySQLServerSide = () => {
                 rowModelType="serverSide"
                 serverSideStoreType="partial"
                 cacheBlockSize={5}
+
                 // onFirstDataRendered={(params) => {
                 //     params.api.getFilterInstance('YEAR', (filterInstance) => {
                 //         filterInstance.setModel({
@@ -197,7 +215,6 @@ const MySQLServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    // filterParams={dateFilterParams}
                     filterParams={dateFilterParams}
                     valueFormatter={(params) =>
                         params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''
@@ -250,4 +267,4 @@ const MySQLServerSide = () => {
     );
 };
 
-export default MySQLServerSide;
+export default MsSqlServerSide;

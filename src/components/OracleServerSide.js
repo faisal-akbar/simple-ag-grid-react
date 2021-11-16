@@ -158,6 +158,7 @@ const OracleServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ values: segmentFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -167,6 +168,7 @@ const OracleServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ values: regionFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -176,6 +178,7 @@ const OracleServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ values: categoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -185,6 +188,7 @@ const OracleServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ values: subCategoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -196,14 +200,22 @@ const OracleServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    // filterParams={dateFilterParams}
                     filterParams={dateFilterParams}
-                    valueFormatter={(params) => moment(params.value).format('MM/DD/YYYY')}
+                    valueFormatter={(params) =>
+                        params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''
+                    }
+                />
+                <AgGridColumn
+                    headerName="Order Id"
+                    field="ORDER_ID"
+                    filter="agTextColumnFilter"
+                    enableRowGroup
+                    hide
+                    filterParams={{ buttons: ['apply', 'reset'] }}
                 />
                 <AgGridColumn
                     headerName="Sales"
                     field="SALES"
-                    // aggFunc="sum"
                     aggFunc="sum"
                     enableValue
                     valueFormatter={currencyFormatter}
@@ -216,7 +228,6 @@ const OracleServerSide = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     chartType="series"
-
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
                     //   defaultJoinOperator: 'OR',
