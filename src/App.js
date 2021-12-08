@@ -4,6 +4,7 @@ import BasicTable from './components/BasicTable';
 import APIContextProvider from './components/Context/apiContext';
 import Layout from './components/Layout';
 import MsSqlServerSide from './components/MsSqlServerSide';
+import MySQLMemo from './components/MySQLMemo';
 import MySQLServerSide from './components/MySQLServerSide';
 import OlympicServerSide from './components/Olympic';
 import OracleServerSide from './components/OracleServerSide';
@@ -34,6 +35,9 @@ function App() {
                             </Route>
                             <Route exact path="/olympic">
                                 <OlympicServerSide />
+                            </Route>
+                            <Route exact path="/mysql-memo">
+                                <MySQLMemo />
                             </Route>
                         </Switch>
                     </Layout>

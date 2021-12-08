@@ -136,6 +136,7 @@ const MySQLServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ values: segmentFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -145,6 +146,7 @@ const MySQLServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ values: regionFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -154,6 +156,7 @@ const MySQLServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
+                    filter="agSetColumnFilter"
                     filterParams={{ values: categoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -169,7 +172,6 @@ const MySQLServerSide = () => {
                 <AgGridColumn
                     headerName="Sales"
                     field="sales"
-                    // aggFunc="sum"
                     aggFunc="sum"
                     enableValue
                     valueFormatter={currencyFormatter}
