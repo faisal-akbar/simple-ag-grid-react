@@ -9,29 +9,96 @@
 }
 
 @layer utilities {
-  :root {
-    --light-theme-primary-color: rgba(249, 250, 251, 1);
-    --light-theme-secondary-color: rgba(229, 231, 235, 1);
-    --dark-theme-primary-color: rgba(17, 24, 39, 1);
-    --dark-theme-secondary-color: rgba(31, 41, 55, 1);
-  }
-
   .ag-theme-alpine {
-    --ag-background-color: var(--light-theme-primary-color);
-    --ag-header-background-color: var(--light-theme-primary-color);
-    --ag-subheader-background-color: var(--light-theme-primary-color);
-    --ag-control-panel-background-color: var(--light-theme-primary-color);
-    --ag-border-color: var(--light-theme-secondary-color);
-    --ag-odd-row-background-color: var(--light-theme-secondary-color);
-    --ag-row-border-color: var(--light-theme-secondary-color);
+    --ag-background-color: theme("colors.gray.100");
+    --ag-header-background-color: theme("colors.gray.100");
+    --ag-subheader-background-color: theme("colors.gray.100");
+    --ag-control-panel-background-color: theme("colors.gray.100");
+    --ag-border-color: theme("colors.gray.200");
+    --ag-odd-row-background-color: theme("colors.gray.200");
+    --ag-row-border-color: theme("colors.gray.200");
+    --ag-input-disabled-background-color: theme("colors.gray.300");
   }
   .ag-theme-alpine-dark {
-    --ag-background-color: var(--dark-theme-primary-color);
-    --ag-header-background-color: var(--dark-theme-primary-color);
-    --ag-subheader-background-color: var(--dark-theme-primary-color);
-    --ag-control-panel-background-color: var(--dark-theme-primary-color);
-    --ag-border-color: var(--dark-theme-secondary-color);
-    --ag-odd-row-background-color: var(--dark-theme-secondary-color);
-    --ag-row-border-color: var(--dark-theme-secondary-color);
+    --ag-background-color: theme("colors.gray.900");
+    --ag-header-background-color: theme("colors.gray.900");
+    --ag-subheader-background-color: theme("colors.gray.900");
+    --ag-control-panel-background-color: theme("colors.gray.900");
+    --ag-border-color: theme("colors.gray.800");
+    --ag-odd-row-background-color: theme("colors.gray.800");
+    --ag-row-border-color: theme("colors.gray.800");
+    --ag-input-disabled-background-color: theme("colors.gray.700");
   }
 }
+
+/* View Scroll css */
+.ag-body-viewport::-webkit-scrollbar-track,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #f5f5f5;
+}
+
+.ag-body-viewport::-webkit-scrollbar,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background-color: #f5f5f5;
+}
+
+.ag-body-viewport::-webkit-scrollbar-thumb,
+.ag-body-horizontal-scroll-viewport::-webkit-scrollbar-thumb {
+  background-color: #0ae;
+  background-image: -webkit-gradient(
+    linear,
+    00,
+    0100%,
+    color-stop(0.5, rgba(255, 255, 255, 0.2)),
+    color-stop(0.5, transparent),
+    to(transparent)
+  );
+}
+
+/* Toolpanel Scroll css */
+.ag-side-bar ::-webkit-scrollbar {
+  width: 10px;
+  background-color: #f5f5f5;
+}
+
+.ag-side-bar ::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #f5f5f5;
+  /* border-radius: 10px; */
+}
+
+.ag-side-bar ::-webkit-scrollbar-thumb {
+  background-color: #0ae;
+  background-image: -webkit-gradient(
+    linear,
+    00,
+    0100%,
+    color-stop(0.5, rgba(255, 255, 255, 0.2)),
+    color-stop(0.5, transparent),
+    to(transparent)
+  );
+}
+
+/* .ag-virtual-list-viewport::-webkit-scrollbar-thumb,
+.ag-tool-panel-wrapper::-webkit-scrollbar-thumb,
+.ag-column-drop-list::-webkit-scrollbar-thumb {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #f5f5f5;
+}
+
+.ag-virtual-list-viewport::-webkit-scrollbar-thumb,
+.ag-tool-panel-wrapper::-webkit-scrollbar-thumb,
+.ag-column-drop-list::-webkit-scrollbar-thumb {
+  background-color: #0ae;
+  background-image: -webkit-gradient(
+    linear,
+    00,
+    0100%,
+    color-stop(0.5, rgba(255, 255, 255, 0.2)),
+    color-stop(0.5, transparent),
+    to(transparent)
+  );
+} */

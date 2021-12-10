@@ -102,7 +102,7 @@ const RowGroupTable = () => {
                         },
                     },
                 }}
-                suppressHorizontalScroll
+                // suppressHorizontalScroll
                 groupIncludeFooter
                 groupIncludeTotalFooter
                 suppressAggFuncInHeader
