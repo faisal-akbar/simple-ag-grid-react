@@ -5,11 +5,17 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useContext, useState } from 'react';
-import { icons } from '../lib/icons';
-import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
-import { ThemeContext } from './Theme/ThemeContext';
+import { icons } from '../../lib/icons';
+import {
+    currencyFormatter,
+    numberFormatter,
+    numberParser,
+    // eslint-disable-next-line prettier/prettier
+    percentFormatter
+} from '../../lib/utils';
+import { ThemeContext } from '../Theme/ThemeContext';
 
-const BasicTable = () => {
+function BasicTable() {
     document.title = 'Basic Table - React ag-grid';
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
@@ -192,6 +198,6 @@ const BasicTable = () => {
             </AgGridReact>
         </div>
     );
-};
+}
 
 export default BasicTable;

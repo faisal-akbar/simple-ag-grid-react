@@ -1,4 +1,3 @@
-/* eslint-disable no-prototype-builtins */
 /* eslint-disable no-unused-vars */
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
@@ -7,51 +6,38 @@ import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useContext, useState } from 'react';
-import { icons } from '../lib/icons';
-import { sideBar } from '../lib/sideBarConfig';
-import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
-import { useAPI } from './Context/apiContext';
-import { ThemeContext } from './Theme/ThemeContext';
+import { icons } from '../../lib/icons';
+import { sideBar } from '../../lib/sideBarConfig';
+import {
+    currencyFormatter,
+    numberFormatter,
+    numberParser,
+    // eslint-disable-next-line prettier/prettier
+    percentFormatter
+} from '../../lib/utils';
+import { DATA_URL } from '../../Workers/constants';
+import { useAPI } from '../Context/apiContext';
+import { ThemeContext } from '../Theme/ThemeContext';
 
-const OracleServerSide = () => {
+const MySQLServerSide = () => {
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
-    const [rowData, setRowData] = useState(null);
     const { theme, setTheme } = useContext(ThemeContext);
-    const { isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter } = useAPI();
+    const [isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter] = useAPI();
 
     const datasource = {
         getRows(params) {
             console.log(JSON.stringify(params.request, null, 1));
-            const url = 'http://localhost:8000/data';
-            fetch(url, {
+
+            fetch(DATA_URL, {
                 method: 'post',
                 body: JSON.stringify(params.request),
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                },
+                headers: { 'Content-Type': 'application/json; charset=utf-8' },
             })
                 .then((httpResponse) => httpResponse.json())
                 .then((response) => {
                     console.log('In POST', response);
-                    // console.log('In POST', response.lastRow);
-                    // =========THIS CODE IS FOR HANDLING DATE IN ROW GROUP==============
-                    const exists =
-                        response.rows.filter((o) => o.hasOwnProperty('ORDER_DATE')).length > 0;
-                    console.log('exists', exists);
-                    if (exists) {
-                        const newRows = response.rows.map((d) => {
-                            const properties = {
-                                ...d,
-                                ORDER_DATE: moment(d.ORDER_DATE).format('DD-MMM-YY'),
-                            };
-                            return properties;
-                        });
-
-                        return params.successCallback(newRows, response.lastRow);
-                    }
-                    // ==================================================================
-                    return params.successCallback(response.rows, response.lastRow);
+                    params.successCallback(response.rows, response.lastRow);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -60,7 +46,6 @@ const OracleServerSide = () => {
         },
     };
 
-    console.log(datasource);
     const onGridReady = (params) => {
         setGridApi(params);
         // register datasource with the grid
@@ -94,6 +79,7 @@ const OracleServerSide = () => {
         },
         defaultOption: 'inRange',
     };
+
     return (
         <div
             className={
@@ -149,12 +135,10 @@ const OracleServerSide = () => {
                 //     });
                 // }}
             >
-                {/* <AgGridColumn field="DATE" /> */}
-                {/* <AgGridColumn field="SEGMENT" filter="agTextColumnFilter" /> */}
-
+                {/* <AgGridColumn field="segment" filter="agTextColumnFilter" /> */}
                 <AgGridColumn
                     headerName="Segment"
-                    field="SEGMENT"
+                    field="segment"
                     enableRowGroup
                     rowGroup
                     hide
@@ -164,7 +148,7 @@ const OracleServerSide = () => {
                 />
                 <AgGridColumn
                     headerName="Region"
-                    field="REGION"
+                    field="region"
                     enableRowGroup
                     rowGroup
                     hide
@@ -174,7 +158,7 @@ const OracleServerSide = () => {
                 />
                 <AgGridColumn
                     headerName="Category"
-                    field="CATEGORY"
+                    field="category"
                     enableRowGroup
                     rowGroup
                     hide
@@ -184,38 +168,16 @@ const OracleServerSide = () => {
                 />
                 <AgGridColumn
                     headerName="Sub Category"
-                    field="SUB_CATEGORY"
+                    field="sub_category"
                     enableRowGroup
                     rowGroup
                     hide
-                    filter="agSetColumnFilter"
                     filterParams={{ values: subCategoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
-                    headerName="Order Date"
-                    field="ORDER_DATE"
-                    filter="agDateColumnFilter"
-                    filterType="date"
-                    enableRowGroup
-                    rowGroup
-                    hide
-                    filterParams={dateFilterParams}
-                    valueFormatter={(params) =>
-                        params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''
-                    }
-                />
-                <AgGridColumn
-                    headerName="Order Id"
-                    field="ORDER_ID"
-                    filter="agTextColumnFilter"
-                    enableRowGroup
-                    hide
-                    filterParams={{ buttons: ['apply', 'reset'] }}
-                />
-                <AgGridColumn
                     headerName="Sales"
-                    field="SALES"
+                    field="sales"
                     aggFunc="sum"
                     enableValue
                     valueFormatter={currencyFormatter}
@@ -228,16 +190,31 @@ const OracleServerSide = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     chartType="series"
+
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
                     //   defaultJoinOperator: 'OR',
                     // }}
                     // allowedAggFuncs={['sum', 'min', 'max']}
                 />
+                <AgGridColumn
+                    headerName="Order Date"
+                    field="order_date"
+                    filter="agDateColumnFilter"
+                    filterType="date"
+                    enableRowGroup
+                    rowGroup
+                    hide
+                    // filterParams={dateFilterParams}
+                    filterParams={dateFilterParams}
+                    valueFormatter={(params) =>
+                        params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''
+                    }
+                />
 
                 <AgGridColumn
                     headerName="Quantity"
-                    field="QUANTITY"
+                    field="quantity"
                     enableValue
                     aggFunc="sum"
                     filter="agNumberColumnFilter"
@@ -252,7 +229,7 @@ const OracleServerSide = () => {
                 />
                 <AgGridColumn
                     headerName="Discount"
-                    field="DISCOUNT"
+                    field="discount"
                     aggFunc="avg"
                     enableValue
                     filter="agNumberColumnFilter"
@@ -263,7 +240,7 @@ const OracleServerSide = () => {
                 />
                 <AgGridColumn
                     headerName="Profit"
-                    field="PROFIT"
+                    field="profit"
                     aggFunc="sum"
                     enableValue
                     valueFormatter={currencyFormatter}
@@ -281,4 +258,4 @@ const OracleServerSide = () => {
     );
 };
 
-export default OracleServerSide;
+export default MySQLServerSide;

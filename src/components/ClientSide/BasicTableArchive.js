@@ -5,8 +5,8 @@ import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useState } from 'react';
-import { icons } from '../lib/icons';
-import { currencyFormatter, numberParser, percentFormatter } from '../lib/utils';
+import { icons } from '../../lib/icons';
+import { currencyFormatter, numberParser, percentFormatter } from '../../lib/utils';
 
 const BasicTableArchive = () => {
     const [gridApi, setGridApi] = useState(null);

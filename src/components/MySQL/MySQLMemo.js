@@ -6,17 +6,28 @@ import 'ag-grid-enterprise';
 import { AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useContext, useMemo, useState } from 'react';
-import { icons } from '../lib/icons';
-import { sideBar } from '../lib/sideBarConfig';
-import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
-import { useAPI } from './Context/apiContext';
-import { ThemeContext } from './Theme/ThemeContext';
+import { icons } from '../../lib/icons';
+import { sideBar } from '../../lib/sideBarConfig';
+import {
+    currencyFormatter,
+    numberFormatter,
+    numberParser,
+    // eslint-disable-next-line prettier/prettier
+    percentFormatter
+} from '../../lib/utils';
+import { DATA_URL } from '../../Workers/constants';
+import Banner from '../Banner';
+import { useAPI } from '../Context/apiContext';
+import { useNotification } from '../Context/notificationContext';
+import SaveViewToolPanel from '../CustomToolPanel/SaveViewToolPanel';
+import { ThemeContext } from '../Theme/ThemeContext';
 
 const MySQLMemo = () => {
+    const { notification, setNotification, setBannerOpen } = useNotification();
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const { theme, setTheme } = useContext(ThemeContext);
-    const { isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter } = useAPI();
+    const [isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter] = useAPI();
 
     const numberFilterParams = {
         buttons: ['apply', 'reset'],
@@ -158,16 +169,20 @@ const MySQLMemo = () => {
         getRows(params) {
             console.log(JSON.stringify(params.request, null, 1));
 
-            const url = 'http://localhost:8000/data';
-            fetch(url, {
+            fetch(DATA_URL, {
                 method: 'post',
                 body: JSON.stringify(params.request),
                 headers: { 'Content-Type': 'application/json; charset=utf-8' },
             })
                 .then((httpResponse) => httpResponse.json())
                 .then((response) => {
+                    if (response.rows.length === 0) {
+                        params.successCallback(response.rows, 0);
+                        return params.api.showNoRowsOverlay();
+                    }
+                    params.api.hideOverlay();
                     console.log('In POST', response);
-                    params.successCallback(response.rows, response.lastRow);
+                    return params.successCallback(response.rows, response.lastRow);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -177,10 +192,53 @@ const MySQLMemo = () => {
     };
 
     const onGridReady = (params) => {
-        setGridApi(params);
+        console.log(params);
+        setGridApi(params.api);
+        setGridColumnApi(params.columnApi);
         // register datasource with the grid
         params.api.setServerSideDatasource(datasource);
     };
+
+    // SAVE STATE
+    const onSaveFilterAndColumnState = () => {
+        const filterState = gridApi.getFilterModel();
+        const columnState = gridColumnApi.getColumnState();
+        console.log('saved filterState & columnState');
+        localStorage.setItem('filterState', JSON.stringify(filterState));
+        console.log('filterState', filterState);
+        localStorage.setItem('columnState', JSON.stringify(columnState));
+        console.log('columnState', columnState);
+        setBannerOpen(true);
+        setNotification('saved');
+    };
+
+    const onLoadFilterAndColumnState = () => {
+        if (localStorage.filterState) {
+            gridApi.setFilterModel(JSON.parse(localStorage.filterState));
+        }
+        if (localStorage.columnState) {
+            gridColumnApi.applyColumnState({
+                state: JSON.parse(localStorage.columnState),
+                applyOrder: true,
+            });
+        }
+        setBannerOpen(true);
+        setNotification('loaded');
+    };
+
+    // const onFirstDataRendered = (params) => {
+    //     if (localStorage.filterState) {
+    //         gridApi.setFilterModel(JSON.parse(localStorage.filterState));
+    //     }
+    //     if (localStorage.columnState) {
+    //         gridColumnApi.applyColumnState({
+    //             state: JSON.parse(localStorage.columnState),
+    //             applyOrder: true,
+    //         });
+    //     }
+    // };
+
+    // console.log('gridApi', gridApi);
 
     return (
         <div
@@ -190,6 +248,10 @@ const MySQLMemo = () => {
                     : 'w-full h-[91vh] overflow-hidden ag-theme-alpine'
             }
         >
+            {/* <HeaderServerSide
+                onSave={onSaveFilterAndColumnState}
+                onLoad={onLoadFilterAndColumnState}
+            /> */}
             <AgGridReact
                 defaultColDef={{
                     flex: 1,
@@ -228,6 +290,9 @@ const MySQLMemo = () => {
                 rowModelType="serverSide"
                 serverSideStoreType="partial"
                 cacheBlockSize={5}
+                frameworkComponents={{ customViewsToolPanel: SaveViewToolPanel }}
+                // onFirstDataRendered={onFirstDataRendered}
+
                 // onFirstDataRendered={(params) => {
                 //     params.api.getFilterInstance('YEAR', (filterInstance) => {
                 //         filterInstance.setModel({
@@ -240,6 +305,13 @@ const MySQLMemo = () => {
             >
                 {/* <AgGridColumn field="segment" filter="agTextColumnFilter" /> */}
             </AgGridReact>
+
+            {/* eslint-disable-next-line no-nested-ternary */}
+            {notification === 'saved' ? (
+                <Banner alertTitle="Saved View" />
+            ) : notification === 'loaded' ? (
+                <Banner alertTitle="Loaded View" />
+            ) : null}
         </div>
     );
 };

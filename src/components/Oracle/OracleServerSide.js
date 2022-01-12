@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable no-unused-vars */
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
@@ -6,42 +7,76 @@ import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useContext, useState } from 'react';
-import { icons } from '../lib/icons';
-import { sideBar } from '../lib/sideBarConfig';
-import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
-import { ThemeContext } from './Theme/ThemeContext';
+import { icons } from '../../lib/icons';
+import { sideBar } from '../../lib/sideBarConfig';
+import {
+    currencyFormatter,
+    numberFormatter,
+    numberParser,
+    // eslint-disable-next-line prettier/prettier
+    percentFormatter
+} from '../../lib/utils';
+import { DATA_URL } from '../../Workers/constants';
+import { useAPI } from '../Context/apiContext';
+import { ThemeContext } from '../Theme/ThemeContext';
 
-const RowGroupTable = () => {
-    document.title = 'Row Group - React ag-grid';
+const OracleServerSide = () => {
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState(null);
     const { theme, setTheme } = useContext(ThemeContext);
+    const [isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter] = useAPI();
 
+    const datasource = {
+        getRows(params) {
+            console.log(JSON.stringify(params.request, null, 1));
+
+            fetch(DATA_URL, {
+                method: 'post',
+                body: JSON.stringify(params.request),
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+            })
+                .then((httpResponse) => httpResponse.json())
+                .then((response) => {
+                    console.log('In POST', response);
+                    // console.log('In POST', response.lastRow);
+                    if (response.rows.length === 0) {
+                        params.successCallback(response.rows, 0);
+                        return params.api.showNoRowsOverlay();
+                    }
+                    params.api.hideOverlay();
+                    // =========THIS CODE IS FOR HANDLING DATE IN ROW GROUP==============
+                    const exists =
+                        response.rows.filter((o) => o.hasOwnProperty('ORDER_DATE')).length > 0;
+                    console.log('exists', exists);
+                    if (exists) {
+                        const newRows = response.rows.map((d) => {
+                            const properties = {
+                                ...d,
+                                ORDER_DATE: moment(d.ORDER_DATE).format('DD-MMM-YY'),
+                            };
+                            return properties;
+                        });
+
+                        return params.successCallback(newRows, response.lastRow);
+                    }
+                    // ==================================================================
+                    return params.successCallback(response.rows, response.lastRow);
+                })
+                .catch((error) => {
+                    console.error(error);
+                    params.failCallback();
+                });
+        },
+    };
+
+    console.log(datasource);
     const onGridReady = (params) => {
-        setGridApi(params.api);
-        setGridColumnApi(params.columnApi);
-
-        const updateData = (data) => {
-            const newData = data.map((d) => {
-                const properties = {
-                    ...d,
-                    // Order_Date: moment(d.Order_Date).format('YYYY-MM-DD'),
-                    // Ship_Date: moment(d.Ship_Date).format('YYYY-MM-DD'),
-                    year: d.order_date.slice(-4),
-                    sales: +d.sales,
-                    quantity: +d.quantity,
-                    discount: +d.discount,
-                    profit: +d.profit,
-                };
-                return properties;
-            });
-            setRowData(newData);
-        };
-
-        fetch('data/superstore.json')
-            .then((resp) => resp.json())
-            .then((data) => updateData(data));
+        setGridApi(params);
+        // register datasource with the grid
+        params.api.setServerSideDatasource(datasource);
     };
 
     const numberFilterParams = {
@@ -71,7 +106,6 @@ const RowGroupTable = () => {
         },
         defaultOption: 'inRange',
     };
-
     return (
         <div
             className={
@@ -90,7 +124,7 @@ const RowGroupTable = () => {
                 }}
                 autoGroupColumnDef={{
                     headerName: 'Segment',
-                    // field: 'segment',
+                    // field: 'Segment',
                     minWidth: 300,
                     cellRendererParams: {
                         footerValueGetter: (params) => {
@@ -102,69 +136,82 @@ const RowGroupTable = () => {
                         },
                     },
                 }}
-                // suppressHorizontalScroll
+                suppressHorizontalScroll
                 groupIncludeFooter
                 groupIncludeTotalFooter
                 suppressAggFuncInHeader
                 animateRows
-                sideBar={sideBar}
+                sideBar={!isLoading ? sideBar : null}
                 icons={icons}
                 rowGroupPanelShow="always"
                 rowSelection="multiple"
-                rowData={rowData}
-                onGridReady={onGridReady}
                 enableCharts
                 enableRangeSelection
+                onGridReady={onGridReady}
+                rowModelType="serverSide"
+                serverSideStoreType="partial"
+                cacheBlockSize={5}
+                // onFirstDataRendered={(params) => {
+                //     params.api.getFilterInstance('YEAR', (filterInstance) => {
+                //         filterInstance.setModel({
+                //             filterType: 'set',
+                //             values: ['2012'],
+                //         });
+                //         params.api.onFilterChanged();
+                //     });
+                // }}
             >
+                {/* <AgGridColumn field="DATE" /> */}
+                {/* <AgGridColumn field="SEGMENT" filter="agTextColumnFilter" /> */}
+
                 <AgGridColumn
                     headerName="Segment"
-                    field="segment"
+                    field="SEGMENT"
                     enableRowGroup
                     rowGroup
                     hide
                     filter="agSetColumnFilter"
-                    filterParams={{ buttons: ['apply', 'reset'] }}
+                    filterParams={{ values: segmentFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
                     headerName="Region"
-                    field="region"
+                    field="REGION"
                     enableRowGroup
                     rowGroup
                     hide
                     filter="agSetColumnFilter"
-                    filterParams={{ buttons: ['apply', 'reset'] }}
+                    filterParams={{ values: regionFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
                     headerName="Category"
-                    field="category"
+                    field="CATEGORY"
                     enableRowGroup
                     rowGroup
                     hide
                     filter="agSetColumnFilter"
-                    filterParams={{ buttons: ['apply', 'reset'] }}
+                    filterParams={{ values: categoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
                     headerName="Sub Category"
-                    field="sub_category"
+                    field="SUB_CATEGORY"
                     enableRowGroup
                     rowGroup
                     hide
                     filter="agSetColumnFilter"
-                    filterParams={{ buttons: ['apply', 'reset'] }}
+                    filterParams={{ values: subCategoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
                 <AgGridColumn
                     headerName="Order Date"
-                    field="order_date"
+                    field="ORDER_DATE"
                     filter="agDateColumnFilter"
                     filterType="date"
                     enableRowGroup
                     rowGroup
                     hide
-                    // filterParams={dateFilterParams}
                     filterParams={dateFilterParams}
                     valueFormatter={(params) =>
                         params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''
@@ -172,7 +219,7 @@ const RowGroupTable = () => {
                 />
                 <AgGridColumn
                     headerName="Order Id"
-                    field="order_id"
+                    field="ORDER_ID"
                     filter="agTextColumnFilter"
                     enableRowGroup
                     hide
@@ -180,8 +227,7 @@ const RowGroupTable = () => {
                 />
                 <AgGridColumn
                     headerName="Sales"
-                    field="sales"
-                    // aggFunc="sum"
+                    field="SALES"
                     aggFunc="sum"
                     enableValue
                     valueFormatter={currencyFormatter}
@@ -194,7 +240,6 @@ const RowGroupTable = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     chartType="series"
-
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
                     //   defaultJoinOperator: 'OR',
@@ -204,7 +249,7 @@ const RowGroupTable = () => {
 
                 <AgGridColumn
                     headerName="Quantity"
-                    field="quantity"
+                    field="QUANTITY"
                     enableValue
                     aggFunc="sum"
                     filter="agNumberColumnFilter"
@@ -219,7 +264,7 @@ const RowGroupTable = () => {
                 />
                 <AgGridColumn
                     headerName="Discount"
-                    field="discount"
+                    field="DISCOUNT"
                     aggFunc="avg"
                     enableValue
                     filter="agNumberColumnFilter"
@@ -230,7 +275,7 @@ const RowGroupTable = () => {
                 />
                 <AgGridColumn
                     headerName="Profit"
-                    field="profit"
+                    field="PROFIT"
                     aggFunc="sum"
                     enableValue
                     valueFormatter={currencyFormatter}
@@ -248,4 +293,4 @@ const RowGroupTable = () => {
     );
 };
 
-export default RowGroupTable;
+export default OracleServerSide;

@@ -26,4 +26,5 @@ export const icons = {
     clipboardCopy: '>>',
     clipboardPaste: '>>',
     rowDrag: '<i class="fa fa-circle"/>',
+    customViewsIcon: '<i class="fa fa-table"/>',
 };

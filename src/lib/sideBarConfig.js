@@ -30,6 +30,13 @@ export const sideBar = {
             maxWidth: 400,
             width: 250,
         },
+        {
+            id: 'customViews',
+            labelDefault: 'Views',
+            labelKey: 'customViews',
+            iconKey: 'customViewsIcon',
+            toolPanel: 'customViewsToolPanel',
+        },
     ],
     position: 'right',
     // defaultToolPanel: 'filters'

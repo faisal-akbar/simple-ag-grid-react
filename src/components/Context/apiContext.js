@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { FILTERS_URL } from '../../Workers/constants';
 
 const APIContext = createContext();
 
@@ -10,7 +11,7 @@ function APIContextProvider({ children }) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://localhost:8000/filters')
+        fetch(FILTERS_URL)
             .then((res) => res.json())
             .then((data) => {
                 const newObj = Object.fromEntries(
@@ -30,19 +31,12 @@ function APIContextProvider({ children }) {
             .catch((err) => console.log(err));
     }, []);
 
-    return (
-        <APIContext.Provider
-            value={{
-                isLoading,
-                segmentFilter,
-                regionFilter,
-                categoryFilter,
-                subCategoryFilter,
-            }}
-        >
-            {children}
-        </APIContext.Provider>
+    const value = useMemo(
+        () => [isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter],
+        [categoryFilter, isLoading, regionFilter, segmentFilter, subCategoryFilter]
     );
+
+    return <APIContext.Provider value={value}>{children}</APIContext.Provider>;
 }
 
 export default APIContextProvider;

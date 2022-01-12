@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-constructed-context-values */
 import React, { createContext, useEffect, useState } from 'react';
 
 const getInitialTheme = () => {

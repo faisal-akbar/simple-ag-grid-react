@@ -4,8 +4,8 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import React, { useState } from 'react';
-import { icons } from '../lib/icons';
-import { sideBar } from '../lib/sideBarConfig';
+import { icons } from '../../lib/icons';
+import { sideBar } from '../../lib/sideBarConfig';
 
 const OlympicServerSide = () => {
     const avoidServerRequest = true;

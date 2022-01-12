@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable no-unused-vars */
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine-dark.css';
@@ -6,24 +7,30 @@ import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useContext, useState } from 'react';
-import { icons } from '../lib/icons';
-import { sideBar } from '../lib/sideBarConfig';
-import { currencyFormatter, numberFormatter, numberParser, percentFormatter } from '../lib/utils';
-import { useAPI } from './Context/apiContext';
-import { ThemeContext } from './Theme/ThemeContext';
+import { icons } from '../../lib/icons';
+import { sideBar } from '../../lib/sideBarConfig';
+import {
+    currencyFormatter,
+    numberFormatter,
+    numberParser,
+    // eslint-disable-next-line prettier/prettier
+    percentFormatter
+} from '../../lib/utils';
+import { DATA_URL } from '../../Workers/constants';
+import { useAPI } from '../Context/apiContext';
+import { ThemeContext } from '../Theme/ThemeContext';
 
-const MySQLServerSide = () => {
+const MsSqlServerSide = () => {
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const { theme, setTheme } = useContext(ThemeContext);
-    const { isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter } = useAPI();
+    const [isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter] = useAPI();
 
     const datasource = {
         getRows(params) {
             console.log(JSON.stringify(params.request, null, 1));
 
-            const url = 'http://localhost:8000/data';
-            fetch(url, {
+            fetch(DATA_URL, {
                 method: 'post',
                 body: JSON.stringify(params.request),
                 headers: { 'Content-Type': 'application/json; charset=utf-8' },
@@ -31,7 +38,28 @@ const MySQLServerSide = () => {
                 .then((httpResponse) => httpResponse.json())
                 .then((response) => {
                     console.log('In POST', response);
-                    params.successCallback(response.rows, response.lastRow);
+                    if (response.rows.length === 0) {
+                        params.successCallback(response.rows, 0);
+                        return params.api.showNoRowsOverlay();
+                    }
+                    params.api.hideOverlay();
+                    // =========THIS CODE IS FOR HANDLING DATE IN ROW GROUP==============
+                    const exists =
+                        response.rows.filter((o) => o.hasOwnProperty('order_date')).length > 0;
+                    console.log('exists', exists);
+                    if (exists) {
+                        const newRows = response.rows.map((d) => {
+                            const properties = {
+                                ...d,
+                                order_date: d.order_date.slice(0, 10),
+                            };
+                            return properties;
+                        });
+
+                        return params.successCallback(newRows, response.lastRow);
+                    }
+                    // ==================================================================
+                    return params.successCallback(response.rows, response.lastRow);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -119,6 +147,7 @@ const MySQLServerSide = () => {
                 rowModelType="serverSide"
                 serverSideStoreType="partial"
                 cacheBlockSize={5}
+
                 // onFirstDataRendered={(params) => {
                 //     params.api.getFilterInstance('YEAR', (filterInstance) => {
                 //         filterInstance.setModel({
@@ -136,7 +165,6 @@ const MySQLServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    filter="agSetColumnFilter"
                     filterParams={{ values: segmentFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -146,7 +174,6 @@ const MySQLServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    filter="agSetColumnFilter"
                     filterParams={{ values: regionFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -156,7 +183,6 @@ const MySQLServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    filter="agSetColumnFilter"
                     filterParams={{ values: categoryFilter, buttons: ['apply', 'reset'] }}
                     chartDataType="category"
                 />
@@ -172,6 +198,7 @@ const MySQLServerSide = () => {
                 <AgGridColumn
                     headerName="Sales"
                     field="sales"
+                    // aggFunc="sum"
                     aggFunc="sum"
                     enableValue
                     valueFormatter={currencyFormatter}
@@ -199,7 +226,6 @@ const MySQLServerSide = () => {
                     enableRowGroup
                     rowGroup
                     hide
-                    // filterParams={dateFilterParams}
                     filterParams={dateFilterParams}
                     valueFormatter={(params) =>
                         params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''
@@ -252,4 +278,4 @@ const MySQLServerSide = () => {
     );
 };
 
-export default MySQLServerSide;
+export default MsSqlServerSide;
