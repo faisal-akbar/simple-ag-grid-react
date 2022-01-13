@@ -15,10 +15,14 @@ import {
     // eslint-disable-next-line prettier/prettier
     percentFormatter
 } from '../../lib/utils';
+import Banner from '../Banner';
+import { useNotification } from '../Context/notificationContext';
+import SaveViewToolPanel from '../CustomToolPanel/SaveViewToolPanel';
 import { ThemeContext } from '../Theme/ThemeContext';
 
 const RowGroupTable = () => {
     document.title = 'Row Group - React ag-grid';
+    const { notification, setNotification, setBannerOpen } = useNotification();
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState(null);
@@ -187,6 +191,7 @@ const RowGroupTable = () => {
                 enableRangeSelection
                 onRowGroupOpened={onRowGroupOpened}
                 onFirstDataRendered={onFirstDataRendered}
+                frameworkComponents={{ customViewsToolPanel: SaveViewToolPanel }}
                 // onCellClicked={(params) => {
                 //     console.log(getExpandedDetails(params.node));
                 // }}
@@ -319,6 +324,12 @@ const RowGroupTable = () => {
                     }}
                 />
             </AgGridReact>
+            {/* eslint-disable-next-line no-nested-ternary */}
+            {notification === 'saved' ? (
+                <Banner alertTitle="Saved View" />
+            ) : notification === 'loaded' ? (
+                <Banner alertTitle="Loaded View" />
+            ) : null}
         </div>
     );
 };
