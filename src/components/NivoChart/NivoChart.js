@@ -47,7 +47,7 @@ const NivoChart = ({ segment, region, category }) => {
     console.log(lineChartData);
 
     return (
-        <div className="chart-card h-[26rem]">
+        <div className="chart-card h-[28rem]">
             <h3 className="chart-title">Monthly Sales</h3>
             {!isLoading ? (
                 <ResponsiveLine
@@ -111,7 +111,7 @@ const NivoChart = ({ segment, region, category }) => {
                                 <div className="tooltip">
                                     <div>Month: {customDate(date, 'MMM, YY')}</div>
                                     {slice.points.map((point) => (
-                                        <div>Sales: ${point.data.yFormatted}</div>
+                                        <div key={date}>Sales: ${point.data.yFormatted}</div>
                                     ))}
                                 </div>
                                 <svg className="tooltip-arrow" width="8" height="8">

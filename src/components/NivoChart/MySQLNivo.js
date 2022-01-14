@@ -19,9 +19,9 @@ import { DATA_URL } from '../../Workers/constants';
 import Banner from '../Banner';
 import { useAPI } from '../Context/apiContext';
 import { useNotification } from '../Context/notificationContext';
-import { ThemeContext } from '../Theme/ThemeContext';
-import ChartModal from './ChartModal';
 import SaveViewToolPanel from '../CustomToolPanel/SaveViewToolPanel';
+import { ThemeContext } from '../Theme/ThemeContext';
+import TrendChartModal from './TrendChartModal';
 
 const MySQLNivo = () => {
     const { notification, setNotification, setBannerOpen } = useNotification();
@@ -285,7 +285,12 @@ const MySQLNivo = () => {
                 onSave={onSaveFilterAndColumnState}
                 onLoad={onLoadFilterAndColumnState}
             /> */}
-            <ChartModal
+            {/* <ChartModal
+                segment={segmentQueryParam}
+                region={regionQueryParam}
+                category={categoryQueryParam}
+            /> */}
+            <TrendChartModal
                 segment={segmentQueryParam}
                 region={regionQueryParam}
                 category={categoryQueryParam}

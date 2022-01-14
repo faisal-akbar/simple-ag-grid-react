@@ -123,8 +123,11 @@ const RowGroupTable = () => {
 
     const onFirstDataRendered = (params) => {
         const groups = store.getItem(OPEN_GROUP_KEY);
+        console.log('onFirstDataRendered groups', groups);
         groups.forEach((groupId) => {
+            console.log('groupId', groupId);
             const node = params.api.getRowNode(groupId);
+            console.log('node', node);
             node.setExpanded(true);
         });
     };
