@@ -1,5 +1,5 @@
 const Background = ({ children }) => (
     // Remove transition-all to disable the background color transition.
-    <body className="bg-white dark:bg-gray-900 transition-all min-h-screen">{children}</body>
+    <body className="min-h-screen bg-white transition-all dark:bg-gray-900">{children}</body>
 );
 export default Background;

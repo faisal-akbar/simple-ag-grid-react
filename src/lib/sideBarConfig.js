@@ -2,6 +2,23 @@
 export const sideBar = {
     toolPanels: [
         {
+            id: 'customViews',
+            labelDefault: 'Views',
+            labelKey: 'customViews',
+            iconKey: 'customViewsIcon',
+            toolPanel: 'customViewsToolPanel',
+        },
+        {
+            id: 'filters',
+            labelDefault: 'Filters',
+            labelKey: 'filters',
+            iconKey: 'filter',
+            toolPanel: 'agFiltersToolPanel',
+            minWidth: 180,
+            maxWidth: 400,
+            width: 250,
+        },
+        {
             id: 'columns',
             labelDefault: 'Columns',
             labelKey: 'columns',
@@ -19,23 +36,6 @@ export const sideBar = {
                 // suppressColumnSelectAll: true,
                 suppressColumnExpandAll: true,
             },
-        },
-        {
-            id: 'filters',
-            labelDefault: 'Filters',
-            labelKey: 'filters',
-            iconKey: 'filter',
-            toolPanel: 'agFiltersToolPanel',
-            minWidth: 180,
-            maxWidth: 400,
-            width: 250,
-        },
-        {
-            id: 'customViews',
-            labelDefault: 'Views',
-            labelKey: 'customViews',
-            iconKey: 'customViewsIcon',
-            toolPanel: 'customViewsToolPanel',
         },
     ],
     position: 'right',

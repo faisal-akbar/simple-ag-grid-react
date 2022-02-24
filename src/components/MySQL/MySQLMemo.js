@@ -6,56 +6,32 @@ import 'ag-grid-enterprise';
 import { AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useContext, useMemo, useState } from 'react';
+import { useAPI } from '../../context/apiContext';
+import { useFeature } from '../../context/featureContext';
+import useMemoize from '../../hooks/useMemoize';
 import { icons } from '../../lib/icons';
 import { sideBar } from '../../lib/sideBarConfig';
 import {
     currencyFormatter,
+    dateFilterParams,
+    numberFilterParams,
     numberFormatter,
     numberParser,
     // eslint-disable-next-line prettier/prettier
     percentFormatter
 } from '../../lib/utils';
 import { DATA_URL } from '../../Workers/constants';
-import Banner from '../Banner';
-import { useAPI } from '../Context/apiContext';
-import { useNotification } from '../Context/notificationContext';
-import SaveViewToolPanel from '../CustomToolPanel/SaveViewToolPanel';
+import { LOCAL_KEY_MYSQL } from '../../Workers/localConstants';
 import { ThemeContext } from '../Theme/ThemeContext';
+import ViewsToolPanel from '../Views/ViewsToolPanel';
 
 const MySQLMemo = () => {
-    const { notification, setNotification, setBannerOpen } = useNotification();
+    const { setLocalKey } = useFeature();
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const { theme, setTheme } = useContext(ThemeContext);
     const [isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter] = useAPI();
-
-    const numberFilterParams = {
-        buttons: ['apply', 'reset'],
-        defaultOption: 'inRange',
-        alwaysShowBothConditions: false,
-        defaultJoinOperator: 'AND',
-    };
-
-    const dateFilterParams = {
-        buttons: ['apply', 'reset'],
-        // eslint-disable-next-line consistent-return
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-            const cellDate = moment(cellValue).startOf('day').toDate();
-
-            if (filterLocalDateAtMidnight.getTime() === cellDate.getTime()) {
-                return 0;
-            }
-
-            if (cellDate < filterLocalDateAtMidnight) {
-                return -1;
-            }
-
-            if (cellDate > filterLocalDateAtMidnight) {
-                return 1;
-            }
-        },
-        defaultOption: 'inRange',
-    };
+    const [defaultColDef, autoGroupColumnDef] = useMemoize();
 
     const colDefs = useMemo(
         () => [
@@ -96,7 +72,10 @@ const MySQLMemo = () => {
                 rowGroup: true,
                 hide: true,
                 filter: 'agSetColumnFilter',
-                filterParams: { values: subCategoryFilter, buttons: ['apply', 'reset'] },
+                filterParams: {
+                    values: subCategoryFilter,
+                    buttons: ['apply', 'reset'],
+                },
                 chartDataType: 'category',
             },
             {
@@ -197,34 +176,35 @@ const MySQLMemo = () => {
         setGridColumnApi(params.columnApi);
         // register datasource with the grid
         params.api.setServerSideDatasource(datasource);
+        setLocalKey(LOCAL_KEY_MYSQL);
     };
 
     // SAVE STATE
-    const onSaveFilterAndColumnState = () => {
-        const filterState = gridApi.getFilterModel();
-        const columnState = gridColumnApi.getColumnState();
-        console.log('saved filterState & columnState');
-        localStorage.setItem('filterState', JSON.stringify(filterState));
-        console.log('filterState', filterState);
-        localStorage.setItem('columnState', JSON.stringify(columnState));
-        console.log('columnState', columnState);
-        setBannerOpen(true);
-        setNotification('saved');
-    };
+    // const onSaveFilterAndColumnState = () => {
+    //     const filterState = gridApi.getFilterModel();
+    //     const columnState = gridColumnApi.getColumnState();
+    //     console.log('saved filterState & columnState');
+    //     localStorage.setItem('filterState', JSON.stringify(filterState));
+    //     console.log('filterState', filterState);
+    //     localStorage.setItem('columnState', JSON.stringify(columnState));
+    //     console.log('columnState', columnState);
+    //     setBannerOpen(true);
+    //     setNotification('saved');
+    // };
 
-    const onLoadFilterAndColumnState = () => {
-        if (localStorage.filterState) {
-            gridApi.setFilterModel(JSON.parse(localStorage.filterState));
-        }
-        if (localStorage.columnState) {
-            gridColumnApi.applyColumnState({
-                state: JSON.parse(localStorage.columnState),
-                applyOrder: true,
-            });
-        }
-        setBannerOpen(true);
-        setNotification('loaded');
-    };
+    // const onLoadFilterAndColumnState = () => {
+    //     if (localStorage.filterState) {
+    //         gridApi.setFilterModel(JSON.parse(localStorage.filterState));
+    //     }
+    //     if (localStorage.columnState) {
+    //         gridColumnApi.applyColumnState({
+    //             state: JSON.parse(localStorage.columnState),
+    //             applyOrder: true,
+    //         });
+    //     }
+    //     setBannerOpen(true);
+    //     setNotification('loaded');
+    // };
 
     // const onFirstDataRendered = (params) => {
     //     if (localStorage.filterState) {
@@ -243,9 +223,7 @@ const MySQLMemo = () => {
     return (
         <div
             className={
-                theme === 'dark'
-                    ? 'w-full h-[91vh] overflow-hidden ag-theme-alpine-dark'
-                    : 'w-full h-[91vh] overflow-hidden ag-theme-alpine'
+                theme === 'dark' ? 'ag-theme-alpine-dark grid-wh' : 'ag-theme-alpine grid-wh'
             }
         >
             {/* <HeaderServerSide
@@ -253,27 +231,9 @@ const MySQLMemo = () => {
                 onLoad={onLoadFilterAndColumnState}
             /> */}
             <AgGridReact
-                defaultColDef={{
-                    flex: 1,
-                    minWidth: 150,
-                    filter: true,
-                    sortable: true,
-                    resizable: true,
-                }}
-                autoGroupColumnDef={{
-                    headerName: 'Segment',
-                    // field: 'Segment',
-                    minWidth: 300,
-                    cellRendererParams: {
-                        footerValueGetter: (params) => {
-                            const isRootLevel = params.node.level === -1;
-                            if (isRootLevel) {
-                                return 'Grand Total';
-                            }
-                            return `Sub Total (${params.value})`;
-                        },
-                    },
-                }}
+                // rowStyle={rowStyle}
+                defaultColDef={defaultColDef}
+                autoGroupColumnDef={autoGroupColumnDef}
                 suppressHorizontalScroll
                 groupIncludeFooter
                 groupIncludeTotalFooter
@@ -290,7 +250,7 @@ const MySQLMemo = () => {
                 rowModelType="serverSide"
                 serverSideStoreType="partial"
                 cacheBlockSize={5}
-                frameworkComponents={{ customViewsToolPanel: SaveViewToolPanel }}
+                frameworkComponents={{ customViewsToolPanel: ViewsToolPanel }}
                 // onFirstDataRendered={onFirstDataRendered}
 
                 // onFirstDataRendered={(params) => {
@@ -307,11 +267,11 @@ const MySQLMemo = () => {
             </AgGridReact>
 
             {/* eslint-disable-next-line no-nested-ternary */}
-            {notification === 'saved' ? (
+            {/* {notification === 'saved' ? (
                 <Banner alertTitle="Saved View" />
             ) : notification === 'loaded' ? (
                 <Banner alertTitle="Loaded View" />
-            ) : null}
+            ) : null} */}
         </div>
     );
 };

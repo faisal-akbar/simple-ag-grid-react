@@ -108,7 +108,7 @@ const BasicTableArchive = () => {
     };
 
     return (
-        <div className="w-full h-screen overflow-hidden ag-theme-alpine">
+        <div className="ag-theme-alpine h-screen w-full overflow-hidden">
             <AgGridReact
                 defaultColDef={defaultColDef}
                 autoGroupColumnDef={autoGroupColumnDef}

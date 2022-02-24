@@ -1,8 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import BasicTable from './components/ClientSide/BasicTable';
 import RowGroupTable from './components/ClientSide/RowGroupTable';
-import APIContextProvider from './components/Context/apiContext';
-import NotificationContextProvider from './components/Context/notificationContext';
 import Layout from './components/Layout';
 import MsSqlServerSide from './components/MSSQL/MsSqlServerSide';
 import MySQLMemo from './components/MySQL/MySQLMemo';
@@ -11,10 +9,12 @@ import OlympicServerSide from './components/MySQL/Olympic';
 import MySQLNivo from './components/NivoChart/MySQLNivo';
 import OracleServerSide from './components/Oracle/OracleServerSide';
 import SocketApp from './components/Socket/SocketApp';
+import APIContextProvider from './context/apiContext';
+import FeatureContextProvider from './context/featureContext';
 
 function App() {
     return (
-        <NotificationContextProvider>
+        <FeatureContextProvider>
             {/* <SocketContext.Provider value={socket}> */}
             <APIContextProvider>
                 <Layout>
@@ -32,7 +32,7 @@ function App() {
                 </Layout>
             </APIContextProvider>
             {/* </SocketContext.Provider> */}
-        </NotificationContextProvider>
+        </FeatureContextProvider>
     );
 }
 

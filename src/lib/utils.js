@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const formatNumber = (num, decimal) =>
     Number.parseFloat(num)
         .toFixed(decimal)
@@ -53,4 +55,33 @@ export const numberFormatter = (params) => {
         return `${formatNumber(params.value, 0)}`;
     }
     return null;
+};
+
+// Number and Date Params AG Grid
+export const numberFilterParams = {
+    buttons: ['apply', 'reset'],
+    defaultOption: 'inRange',
+    alwaysShowBothConditions: false,
+    defaultJoinOperator: 'AND',
+};
+
+export const dateFilterParams = {
+    buttons: ['apply', 'reset'],
+    // eslint-disable-next-line consistent-return
+    comparator: (filterLocalDateAtMidnight, cellValue) => {
+        const cellDate = moment(cellValue).startOf('day').toDate();
+
+        if (filterLocalDateAtMidnight.getTime() === cellDate.getTime()) {
+            return 0;
+        }
+
+        if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+        }
+
+        if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+        }
+    },
+    defaultOption: 'inRange',
 };

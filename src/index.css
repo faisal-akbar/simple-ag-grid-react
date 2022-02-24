@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 dark:bg-gray-900 transition-colors antialiased;
+    @apply bg-gray-50 antialiased transition-colors dark:bg-gray-900;
   }
 }
 
@@ -105,7 +105,7 @@
 
 /* Nivo Chart */
 .chart-card {
-  @apply border border-gray-100 shadow-md rounded py-5 bg-white dark:bg-gray-800 dark:border-gray-800;
+  @apply rounded border border-gray-100 bg-white py-5 shadow-md dark:border-gray-800 dark:bg-gray-800;
 }
 
 .chart-title {
@@ -113,9 +113,28 @@
 }
 
 .tooltip {
-  @apply absolute top-0 z-10 w-48 p-2 -mt-1 text-sm leading-tight dark:text-white transform -translate-x-1/2 -translate-y-full dark:bg-gray-600 bg-gray-100 text-gray-900 rounded-lg shadow-lg;
+  @apply absolute top-0 z-10 -mt-1 w-48 -translate-x-1/2 -translate-y-full transform rounded-lg bg-gray-100 p-2 text-sm leading-tight text-gray-900 shadow-lg dark:bg-gray-600 dark:text-white;
 }
 
 .tooltip-arrow {
-  @apply absolute z-10 w-6 h-6 dark:text-gray-600 text-gray-100 transform -translate-x-1/2 -translate-y-3 fill-current stroke-current;
+  @apply absolute z-10 h-6 w-6 -translate-x-1/2 -translate-y-3 transform fill-current stroke-current text-gray-100 dark:text-gray-600;
+}
+
+/* Socket Custom Animation Renderer */
+.valueChangeDown {
+  @apply !bg-red-800;
+}
+
+.valueChangeUp {
+  @apply !bg-green-800;
+}
+
+/* Custom View ToolPanel */
+.ag-react-container {
+  @apply w-full;
+}
+
+/* Grid Width Heigh */
+.grid-wh {
+  @apply h-[91vh] w-full overflow-hidden;
 }

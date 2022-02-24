@@ -63,7 +63,7 @@ const OlympicServerSide = () => {
     // }, []);
 
     return (
-        <div className="w-full h-[91vh] overflow-hidden ag-theme-alpine">
+        <div className="ag-theme-alpine grid-wh">
             <AgGridReact
                 defaultColDef={{
                     flex: 1,

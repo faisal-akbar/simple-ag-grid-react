@@ -80,9 +80,7 @@ function BasicTable() {
     return (
         <div
             className={
-                theme === 'dark'
-                    ? 'w-full h-[91vh] overflow-hidden ag-theme-alpine-dark'
-                    : 'w-full h-[91vh] overflow-hidden ag-theme-alpine'
+                theme === 'dark' ? 'ag-theme-alpine-dark grid-wh' : 'ag-theme-alpine grid-wh'
             }
         >
             <AgGridReact

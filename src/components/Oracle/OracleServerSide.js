@@ -7,17 +7,20 @@ import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useContext, useState } from 'react';
+import { useAPI } from '../../context/apiContext';
+import useMemoize from '../../hooks/useMemoize';
 import { icons } from '../../lib/icons';
 import { sideBar } from '../../lib/sideBarConfig';
 import {
     currencyFormatter,
+    dateFilterParams,
+    numberFilterParams,
     numberFormatter,
     numberParser,
     // eslint-disable-next-line prettier/prettier
     percentFormatter
 } from '../../lib/utils';
 import { DATA_URL } from '../../Workers/constants';
-import { useAPI } from '../Context/apiContext';
 import { ThemeContext } from '../Theme/ThemeContext';
 
 const OracleServerSide = () => {
@@ -26,6 +29,7 @@ const OracleServerSide = () => {
     const [rowData, setRowData] = useState(null);
     const { theme, setTheme } = useContext(ThemeContext);
     const [isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter] = useAPI();
+    const [defaultColDef, autoGroupColumnDef] = useMemoize();
 
     const datasource = {
         getRows(params) {
@@ -79,63 +83,15 @@ const OracleServerSide = () => {
         params.api.setServerSideDatasource(datasource);
     };
 
-    const numberFilterParams = {
-        buttons: ['apply', 'reset'],
-        defaultOption: 'inRange',
-        alwaysShowBothConditions: false,
-        defaultJoinOperator: 'AND',
-    };
-
-    const dateFilterParams = {
-        buttons: ['apply', 'reset'],
-        // eslint-disable-next-line consistent-return
-        comparator: (filterLocalDateAtMidnight, cellValue) => {
-            const cellDate = moment(cellValue).startOf('day').toDate();
-
-            if (filterLocalDateAtMidnight.getTime() === cellDate.getTime()) {
-                return 0;
-            }
-
-            if (cellDate < filterLocalDateAtMidnight) {
-                return -1;
-            }
-
-            if (cellDate > filterLocalDateAtMidnight) {
-                return 1;
-            }
-        },
-        defaultOption: 'inRange',
-    };
     return (
         <div
             className={
-                theme === 'dark'
-                    ? 'w-full h-[91vh] overflow-hidden ag-theme-alpine-dark'
-                    : 'w-full h-[91vh] overflow-hidden ag-theme-alpine'
+                theme === 'dark' ? 'ag-theme-alpine-dark grid-wh' : 'ag-theme-alpine grid-wh'
             }
         >
             <AgGridReact
-                defaultColDef={{
-                    flex: 1,
-                    minWidth: 150,
-                    filter: true,
-                    sortable: true,
-                    resizable: true,
-                }}
-                autoGroupColumnDef={{
-                    headerName: 'Segment',
-                    // field: 'Segment',
-                    minWidth: 300,
-                    cellRendererParams: {
-                        footerValueGetter: (params) => {
-                            const isRootLevel = params.node.level === -1;
-                            if (isRootLevel) {
-                                return 'Grand Total';
-                            }
-                            return `Sub Total (${params.value})`;
-                        },
-                    },
-                }}
+                defaultColDef={defaultColDef}
+                autoGroupColumnDef={autoGroupColumnDef}
                 suppressHorizontalScroll
                 groupIncludeFooter
                 groupIncludeTotalFooter
@@ -201,7 +157,10 @@ const OracleServerSide = () => {
                     rowGroup
                     hide
                     filter="agSetColumnFilter"
-                    filterParams={{ values: subCategoryFilter, buttons: ['apply', 'reset'] }}
+                    filterParams={{
+                        values: subCategoryFilter,
+                        buttons: ['apply', 'reset'],
+                    }}
                     chartDataType="category"
                 />
                 <AgGridColumn

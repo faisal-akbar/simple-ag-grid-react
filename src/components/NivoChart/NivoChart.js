@@ -4,6 +4,7 @@ import { ResponsiveLine } from '@nivo/line';
 import moment from 'moment';
 import React, { useContext, useEffect, useState } from 'react';
 import { NIVO_CHART_URL } from '../../Workers/constants';
+import PreLoader from '../PreLoader';
 import { chartThemeDark, chartThemeLight } from '../Theme/ChartTheme';
 import { ThemeContext } from '../Theme/ThemeContext';
 
@@ -55,7 +56,12 @@ const NivoChart = ({ segment, region, category }) => {
                     margin={{ top: 30, right: 60, bottom: 90, left: 60 }}
                     theme={theme === 'dark' ? chartThemeDark : chartThemeLight}
                     // For Date field use following instead of xScale Point
-                    xScale={{ type: 'time', format: '%Y-%m-%d', useUTC: false, precision: 'day' }}
+                    xScale={{
+                        type: 'time',
+                        format: '%Y-%m-%d',
+                        useUTC: false,
+                        precision: 'day',
+                    }}
                     xFormat="time:%Y-%m-%d"
                     // xScale={{ type: 'point' }}
                     yScale={{
@@ -137,7 +143,9 @@ const NivoChart = ({ segment, region, category }) => {
                     legends={[]}
                 />
             ) : (
-                <h1>Loading...</h1>
+                <div>
+                    <PreLoader isLoading={isLoading} />
+                </div>
             )}
         </div>
     );

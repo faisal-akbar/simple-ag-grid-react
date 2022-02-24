@@ -6,6 +6,7 @@ import 'ag-grid-enterprise';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useContext, useState } from 'react';
+import { useFeature } from '../../context/featureContext';
 import { icons } from '../../lib/icons';
 import { sideBar } from '../../lib/sideBarConfig';
 import {
@@ -15,14 +16,58 @@ import {
     // eslint-disable-next-line prettier/prettier
     percentFormatter
 } from '../../lib/utils';
-import Banner from '../Banner';
-import { useNotification } from '../Context/notificationContext';
-import SaveViewToolPanel from '../CustomToolPanel/SaveViewToolPanel';
+import { LOCAL_KEY_ROW_GROUP_TABLE } from '../../Workers/localConstants';
 import { ThemeContext } from '../Theme/ThemeContext';
+import ViewsToolPanel from '../Views/ViewsToolPanel';
+
+// Save Group State
+function Store(store) {
+    return {
+        setItem: (key, item) => {
+            if (!key) {
+                return null;
+            }
+            return store.setItem(key, JSON.stringify(item));
+        },
+        getItem: (key) => {
+            if (!key) {
+                return null;
+            }
+            return JSON.parse(store.getItem(key));
+        },
+        clear: () => store.clear(),
+    };
+}
+const store = new Store(window.localStorage);
+const OPEN_GROUP_KEY = 'openGroups';
+
+(function initialiseGroupStore() {
+    let groups = store.getItem(OPEN_GROUP_KEY);
+    if (!groups) groups = [];
+    store.setItem(OPEN_GROUP_KEY, groups);
+})();
+
+function addGroupToStore(id) {
+    const groups = store.getItem(OPEN_GROUP_KEY);
+    if (groups.indexOf(id) > -1) {
+        return;
+    }
+    groups.push(id);
+    store.setItem(OPEN_GROUP_KEY, groups);
+}
+
+function removeGroupFromStore(id) {
+    const groups = store.getItem(OPEN_GROUP_KEY);
+    const index = groups.indexOf(id);
+    if (index > -1) {
+        groups.splice(index, 1);
+    }
+    store.setItem(OPEN_GROUP_KEY, groups);
+}
 
 const RowGroupTable = () => {
     document.title = 'Row Group - React ag-grid';
-    const { notification, setNotification, setBannerOpen } = useNotification();
+    const { setLocalKey } = useFeature();
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState(null);
@@ -31,6 +76,7 @@ const RowGroupTable = () => {
     const onGridReady = (params) => {
         setGridApi(params.api);
         setGridColumnApi(params.columnApi);
+        setLocalKey(LOCAL_KEY_ROW_GROUP_TABLE);
 
         const updateData = (data) => {
             const newData = data.map((d) => {
@@ -82,52 +128,11 @@ const RowGroupTable = () => {
         defaultOption: 'inRange',
     };
 
-    // Save Group State
-    function Store(store) {
-        return {
-            setItem: (key, item) => {
-                if (!key) {
-                    return null;
-                }
-                return store.setItem(key, JSON.stringify(item));
-            },
-            getItem: (key) => {
-                if (!key) {
-                    return null;
-                }
-                return JSON.parse(store.getItem(key));
-            },
-            clear: () => store.clear(),
-        };
-    }
-    const OPEN_GROUP_KEY = 'openGroups';
-    const store = Store(window.localStorage);
-
-    function addGroupToStore(id, storeKey) {
-        const groups = store.getItem(storeKey);
-        if (groups.indexOf(id) > -1) {
-            return;
-        }
-        groups.push(id);
-        store.setItem(storeKey, groups);
-    }
-
-    function removeGroupFromStore(id, storeKey) {
-        const groups = store.getItem(storeKey);
-        const index = groups.indexOf(id);
-        if (index > -1) {
-            groups.splice(index, 1);
-        }
-        store.setItem(storeKey, groups);
-    }
-
-    const onFirstDataRendered = (params) => {
+    // Save group state
+    const onFirstDataRendered = (_params) => {
         const groups = store.getItem(OPEN_GROUP_KEY);
-        console.log('onFirstDataRendered groups', groups);
         groups.forEach((groupId) => {
-            console.log('groupId', groupId);
-            const node = params.api.getRowNode(groupId);
-            console.log('node', node);
+            const node = gridApi.getRowNode(groupId);
             node.setExpanded(true);
         });
     };
@@ -135,26 +140,20 @@ const RowGroupTable = () => {
     const onRowGroupOpened = (params) => {
         if (params.node.expanded) {
             console.log('adding id to store', params.node.id);
-            addGroupToStore(params.node.id, OPEN_GROUP_KEY);
+            addGroupToStore(params.node.id);
         } else {
             console.log('removing id from store', params.node.id);
-            removeGroupFromStore(params.node.id, OPEN_GROUP_KEY);
+            removeGroupFromStore(params.node.id);
         }
+        console.log(store.getItem(OPEN_GROUP_KEY));
     };
-
-    function initialiseGroupStore(storeKey) {
-        let groups = store.getItem(storeKey);
-        if (!groups) groups = [];
-        store.setItem(storeKey, groups);
-    }
-    initialiseGroupStore(OPEN_GROUP_KEY);
 
     return (
         <div
             className={
                 theme === 'dark'
-                    ? 'w-full h-[91vh] overflow-hidden ag-theme-alpine-dark'
-                    : 'w-full h-[91vh] overflow-hidden ag-theme-alpine'
+                    ? 'ag-theme-alpine-dark grid-wh'
+                    : 'ag-theme-alpine grid-wh'
             }
         >
             <AgGridReact
@@ -194,7 +193,7 @@ const RowGroupTable = () => {
                 enableRangeSelection
                 onRowGroupOpened={onRowGroupOpened}
                 onFirstDataRendered={onFirstDataRendered}
-                frameworkComponents={{ customViewsToolPanel: SaveViewToolPanel }}
+                frameworkComponents={{ customViewsToolPanel: ViewsToolPanel }}
                 // onCellClicked={(params) => {
                 //     console.log(getExpandedDetails(params.node));
                 // }}
@@ -208,6 +207,7 @@ const RowGroupTable = () => {
                     filter="agSetColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
+                    keyCreator={({ value }) => (value === null ? 'Null' : value)}
                 />
                 <AgGridColumn
                     headerName="Region"
@@ -218,6 +218,7 @@ const RowGroupTable = () => {
                     filter="agSetColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
+                    keyCreator={({ value }) => (value === null ? 'Null' : value)}
                 />
                 <AgGridColumn
                     headerName="Category"
@@ -228,6 +229,7 @@ const RowGroupTable = () => {
                     filter="agSetColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
+                    keyCreator={({ value }) => (value === null ? 'Null' : value)}
                 />
                 <AgGridColumn
                     headerName="Sub Category"
@@ -238,6 +240,7 @@ const RowGroupTable = () => {
                     filter="agSetColumnFilter"
                     filterParams={{ buttons: ['apply', 'reset'] }}
                     chartDataType="category"
+                    keyCreator={({ value }) => (value === null ? 'Null' : value)}
                 />
                 <AgGridColumn
                     headerName="Order Date"
@@ -252,6 +255,7 @@ const RowGroupTable = () => {
                     valueFormatter={(params) =>
                         params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''
                     }
+                    // keyCreator={({ value }) => (value === null ? 'Null' : value)}
                 />
                 <AgGridColumn
                     headerName="Order Id"
@@ -260,6 +264,7 @@ const RowGroupTable = () => {
                     enableRowGroup
                     hide
                     filterParams={{ buttons: ['apply', 'reset'] }}
+                    keyCreator={({ value }) => (value === null ? 'Null' : value)}
                 />
                 <AgGridColumn
                     headerName="Sales"
@@ -328,11 +333,11 @@ const RowGroupTable = () => {
                 />
             </AgGridReact>
             {/* eslint-disable-next-line no-nested-ternary */}
-            {notification === 'saved' ? (
+            {/* {notification === 'saved' ? (
                 <Banner alertTitle="Saved View" />
             ) : notification === 'loaded' ? (
                 <Banner alertTitle="Loaded View" />
-            ) : null}
+            ) : null} */}
         </div>
     );
 };

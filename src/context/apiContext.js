@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { FILTERS_URL } from '../../Workers/constants';
+import { FILTERS_URL } from '../Workers/constants';
 
 const APIContext = createContext();
 
