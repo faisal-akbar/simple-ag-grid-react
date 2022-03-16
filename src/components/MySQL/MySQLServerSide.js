@@ -148,7 +148,7 @@ const MySQLServerSide = () => {
                     filter="agNumberColumnFilter"
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
-                    chartType="series"
+                    chartDataType="series"
 
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
@@ -180,7 +180,7 @@ const MySQLServerSide = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     valueFormatter={numberFormatter}
-                    chartType="series"
+                    chartDataType="series"
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
                     //   defaultJoinOperator: 'OR',
@@ -195,7 +195,7 @@ const MySQLServerSide = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     valueFormatter={percentFormatter}
-                    chartType="series"
+                    chartDataType="series"
                 />
                 <AgGridColumn
                     headerName="Profit"
@@ -206,7 +206,7 @@ const MySQLServerSide = () => {
                     filter="agNumberColumnFilter"
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
-                    chartType="series"
+                    chartDataType="series"
                     cellClassRules={{
                         'text-green-500': 'x >= 0',
                         'text-red-400': 'x < 0',

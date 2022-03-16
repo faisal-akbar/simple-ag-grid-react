@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 const dateArray = [];
 const dimensionArray = [];
 const measureArray = [];
@@ -7,7 +8,7 @@ const makeDateColDef = (dateArray) => {
     const colArray = dateArray;
     const colDefs = colArray.map(
         (col) =>
-            `{headerName: '${col}',field: '${col}',filter: 'agDateColumnFilter',filterType: 'date',enableRowGroup: true,rowGroup: true,hide: true,filterParams: dateFilterParams,valueFormatter: (params) => params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''}`
+            `{headerName: '${col}',field: '${col}',filter: 'agDateColumnFilter',enableRowGroup: true,rowGroup: true,hide: true,filterParams: dateFilterParams,valueFormatter: (params) => params.value !== undefined ? moment(params.value).format('MM/DD/YYYY') : ''}`
     );
     return colDefs;
 };
@@ -26,7 +27,7 @@ const makeMeasureColDef = (numArray) => {
     const colArray = numArray;
     const colDefs = colArray.map(
         (col) =>
-            `{headerName: '${col}',field: '${col}',enableValue: true,aggFunc: 'sum',filter: 'agNumberColumnFilter',filterParams: numberFilterParams,valueParser: numberParser,valueFormatter: numberFormatter,chartType: 'series'}`
+            `{headerName: '${col}',field: '${col}',enableValue: true,aggFunc: 'sum',filter: 'agNumberColumnFilter',filterParams: numberFilterParams,valueParser: numberParser,valueFormatter: numberFormatter,chartDataType: 'series'}`
     );
     return colDefs;
 };

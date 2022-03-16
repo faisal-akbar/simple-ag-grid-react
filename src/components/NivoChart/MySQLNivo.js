@@ -101,7 +101,7 @@ const MySQLNivo = () => {
                 // eslint-disable-next-line no-use-before-define
                 filterParams: numberFilterParams,
                 valueParser: numberParser,
-                chartType: 'series',
+                chartDataType: 'series',
             },
 
             {
@@ -113,7 +113,7 @@ const MySQLNivo = () => {
                 filterParams: numberFilterParams,
                 valueParser: numberParser,
                 valueFormatter: numberFormatter,
-                chartType: 'series',
+                chartDataType: 'series',
             },
             {
                 headerName: 'Discount',
@@ -124,7 +124,7 @@ const MySQLNivo = () => {
                 filterParams: numberFilterParams,
                 valueParser: numberParser,
                 valueFormatter: percentFormatter,
-                chartType: 'series',
+                chartDataType: 'series',
             },
             {
                 headerName: 'Profit',
@@ -135,7 +135,7 @@ const MySQLNivo = () => {
                 filter: 'agNumberColumnFilter',
                 filterParams: numberFilterParams,
                 valueParser: numberParser,
-                chartType: 'series',
+                chartDataType: 'series',
                 cellClassRules: {
                     'text-green-500': 'x >= 0',
                     'text-red-400': 'x < 0',

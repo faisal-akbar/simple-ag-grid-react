@@ -125,7 +125,6 @@ function BasicTable() {
                     headerName="Order Date"
                     field="order_date"
                     filter="agDateColumnFilter"
-                    filterType="date"
                     // filterParams={dateFilterParams}
                     filterParams={dateFilterParams}
                     valueFormatter={(params) =>
@@ -137,7 +136,6 @@ function BasicTable() {
                     headerName="Ship Date"
                     field="ship_date"
                     filter="agDateColumnFilter"
-                    filterType="date"
                     filterParams={dateFilterParams}
                     valueFormatter={(params) => moment(params.value).format('MM/DD/YYYY')}
                 />

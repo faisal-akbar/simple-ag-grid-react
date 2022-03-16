@@ -67,6 +67,9 @@ function removeGroupFromStore(id) {
 
 const RowGroupTable = () => {
     document.title = 'Row Group - React ag-grid';
+    const [component] = useState({
+        customViewsToolPanel: ViewsToolPanel,
+    });
     const { setLocalKey } = useFeature();
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
@@ -74,9 +77,9 @@ const RowGroupTable = () => {
     const { theme, setTheme } = useContext(ThemeContext);
 
     const onGridReady = (params) => {
+        setLocalKey(LOCAL_KEY_ROW_GROUP_TABLE);
         setGridApi(params.api);
         setGridColumnApi(params.columnApi);
-        setLocalKey(LOCAL_KEY_ROW_GROUP_TABLE);
 
         const updateData = (data) => {
             const newData = data.map((d) => {
@@ -151,9 +154,7 @@ const RowGroupTable = () => {
     return (
         <div
             className={
-                theme === 'dark'
-                    ? 'ag-theme-alpine-dark grid-wh'
-                    : 'ag-theme-alpine grid-wh'
+                theme === 'dark' ? 'ag-theme-alpine-dark grid-wh' : 'ag-theme-alpine grid-wh'
             }
         >
             <AgGridReact
@@ -193,7 +194,7 @@ const RowGroupTable = () => {
                 enableRangeSelection
                 onRowGroupOpened={onRowGroupOpened}
                 onFirstDataRendered={onFirstDataRendered}
-                frameworkComponents={{ customViewsToolPanel: ViewsToolPanel }}
+                components={component}
                 // onCellClicked={(params) => {
                 //     console.log(getExpandedDetails(params.node));
                 // }}
@@ -246,7 +247,6 @@ const RowGroupTable = () => {
                     headerName="Order Date"
                     field="order_date"
                     filter="agDateColumnFilter"
-                    filterType="date"
                     enableRowGroup
                     rowGroup
                     hide
@@ -281,7 +281,7 @@ const RowGroupTable = () => {
                     filter="agNumberColumnFilter"
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
-                    chartType="series"
+                    chartDataType="series"
 
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
@@ -299,7 +299,7 @@ const RowGroupTable = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     valueFormatter={numberFormatter}
-                    chartType="series"
+                    chartDataType="series"
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
                     //   defaultJoinOperator: 'OR',
@@ -314,7 +314,7 @@ const RowGroupTable = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     valueFormatter={percentFormatter}
-                    chartType="series"
+                    chartDataType="series"
                 />
                 <AgGridColumn
                     headerName="Profit"
@@ -325,7 +325,7 @@ const RowGroupTable = () => {
                     filter="agNumberColumnFilter"
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
-                    chartType="series"
+                    chartDataType="series"
                     cellClassRules={{
                         'text-green-500': 'x >= 0',
                         'text-red-400': 'x < 0',

@@ -8,6 +8,7 @@ import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import moment from 'moment';
 import React, { useContext, useState } from 'react';
 import { useAPI } from '../../context/apiContext';
+import { useFeature } from '../../context/featureContext';
 import useMemoize from '../../hooks/useMemoize';
 import { icons } from '../../lib/icons';
 import { sideBar } from '../../lib/sideBarConfig';
@@ -21,15 +22,21 @@ import {
     percentFormatter
 } from '../../lib/utils';
 import { DATA_URL } from '../../Workers/constants';
+import { LOCAL_KEY_ORACLE } from '../../Workers/localConstants';
 import { ThemeContext } from '../Theme/ThemeContext';
+import ViewsToolPanel from '../Views/ViewsToolPanel';
 
 const OracleServerSide = () => {
+    const [components] = useState({
+        customViewsToolPanel: ViewsToolPanel,
+    });
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
     const [rowData, setRowData] = useState(null);
     const { theme, setTheme } = useContext(ThemeContext);
     const [isLoading, segmentFilter, regionFilter, categoryFilter, subCategoryFilter] = useAPI();
     const [defaultColDef, autoGroupColumnDef] = useMemoize();
+    const { setLocalKey } = useFeature();
 
     const datasource = {
         getRows(params) {
@@ -76,11 +83,13 @@ const OracleServerSide = () => {
         },
     };
 
-    console.log(datasource);
+    // console.log(datasource);
     const onGridReady = (params) => {
-        setGridApi(params);
+        setGridApi(params.api);
+        setGridColumnApi(params.columnApi);
         // register datasource with the grid
         params.api.setServerSideDatasource(datasource);
+        setLocalKey(LOCAL_KEY_ORACLE);
     };
 
     return (
@@ -107,6 +116,7 @@ const OracleServerSide = () => {
                 rowModelType="serverSide"
                 serverSideStoreType="partial"
                 cacheBlockSize={5}
+                components={components}
                 // onFirstDataRendered={(params) => {
                 //     params.api.getFilterInstance('YEAR', (filterInstance) => {
                 //         filterInstance.setModel({
@@ -167,7 +177,6 @@ const OracleServerSide = () => {
                     headerName="Order Date"
                     field="ORDER_DATE"
                     filter="agDateColumnFilter"
-                    filterType="date"
                     enableRowGroup
                     rowGroup
                     hide
@@ -198,7 +207,7 @@ const OracleServerSide = () => {
                     filter="agNumberColumnFilter"
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
-                    chartType="series"
+                    chartDataType="series"
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
                     //   defaultJoinOperator: 'OR',
@@ -215,7 +224,7 @@ const OracleServerSide = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     valueFormatter={numberFormatter}
-                    chartType="series"
+                    chartDataType="series"
                     // filterParams={{
                     //   alwaysShowBothConditions: true,
                     //   defaultJoinOperator: 'OR',
@@ -230,7 +239,7 @@ const OracleServerSide = () => {
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
                     valueFormatter={percentFormatter}
-                    chartType="series"
+                    chartDataType="series"
                 />
                 <AgGridColumn
                     headerName="Profit"
@@ -241,7 +250,7 @@ const OracleServerSide = () => {
                     filter="agNumberColumnFilter"
                     filterParams={numberFilterParams}
                     valueParser={numberParser}
-                    chartType="series"
+                    chartDataType="series"
                     cellClassRules={{
                         'text-green-500': 'x >= 0',
                         'text-red-400': 'x < 0',

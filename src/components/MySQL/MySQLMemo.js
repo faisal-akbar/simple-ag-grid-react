@@ -26,6 +26,9 @@ import { ThemeContext } from '../Theme/ThemeContext';
 import ViewsToolPanel from '../Views/ViewsToolPanel';
 
 const MySQLMemo = () => {
+    const [components] = useState({
+        customViewsToolPanel: ViewsToolPanel,
+    });
     const { setLocalKey } = useFeature();
     const [gridApi, setGridApi] = useState(null);
     const [gridColumnApi, setGridColumnApi] = useState(null);
@@ -88,13 +91,13 @@ const MySQLMemo = () => {
                 // eslint-disable-next-line no-use-before-define
                 filterParams: numberFilterParams,
                 valueParser: numberParser,
-                chartType: 'series',
+                chartDataType: 'series',
             },
             {
                 headerName: 'Order Date',
                 field: 'order_date',
                 filter: 'agDateColumnFilter',
-                filterType: 'date',
+
                 enableRowGroup: true,
                 rowGroup: true,
                 hide: true,
@@ -111,7 +114,7 @@ const MySQLMemo = () => {
                 filterParams: numberFilterParams,
                 valueParser: numberParser,
                 valueFormatter: numberFormatter,
-                chartType: 'series',
+                chartDataType: 'series',
             },
             {
                 headerName: 'Discount',
@@ -122,7 +125,7 @@ const MySQLMemo = () => {
                 filterParams: numberFilterParams,
                 valueParser: numberParser,
                 valueFormatter: percentFormatter,
-                chartType: 'series',
+                chartDataType: 'series',
             },
             {
                 headerName: 'Profit',
@@ -133,7 +136,7 @@ const MySQLMemo = () => {
                 filter: 'agNumberColumnFilter',
                 filterParams: numberFilterParams,
                 valueParser: numberParser,
-                chartType: 'series',
+                chartDataType: 'series',
                 cellClassRules: {
                     'text-green-500': 'x >= 0',
                     'text-red-400': 'x < 0',
@@ -171,7 +174,7 @@ const MySQLMemo = () => {
     };
 
     const onGridReady = (params) => {
-        console.log(params);
+        // console.log(params);
         setGridApi(params.api);
         setGridColumnApi(params.columnApi);
         // register datasource with the grid
@@ -188,8 +191,8 @@ const MySQLMemo = () => {
     //     console.log('filterState', filterState);
     //     localStorage.setItem('columnState', JSON.stringify(columnState));
     //     console.log('columnState', columnState);
-    //     setBannerOpen(true);
-    //     setNotification('saved');
+    //     // setBannerOpen(true);
+    //     // setNotification('saved');
     // };
 
     // const onLoadFilterAndColumnState = () => {
@@ -202,8 +205,8 @@ const MySQLMemo = () => {
     //             applyOrder: true,
     //         });
     //     }
-    //     setBannerOpen(true);
-    //     setNotification('loaded');
+    //     // setBannerOpen(true);
+    //     // setNotification('loaded');
     // };
 
     // const onFirstDataRendered = (params) => {
@@ -226,6 +229,12 @@ const MySQLMemo = () => {
                 theme === 'dark' ? 'ag-theme-alpine-dark grid-wh' : 'ag-theme-alpine grid-wh'
             }
         >
+            {/* <button type="button" onClick={onSaveFilterAndColumnState}>
+                save
+            </button>
+            <button type="button" onClick={onLoadFilterAndColumnState}>
+                load
+            </button> */}
             {/* <HeaderServerSide
                 onSave={onSaveFilterAndColumnState}
                 onLoad={onLoadFilterAndColumnState}
@@ -234,7 +243,7 @@ const MySQLMemo = () => {
                 // rowStyle={rowStyle}
                 defaultColDef={defaultColDef}
                 autoGroupColumnDef={autoGroupColumnDef}
-                suppressHorizontalScroll
+                // suppressHorizontalScroll
                 groupIncludeFooter
                 groupIncludeTotalFooter
                 suppressAggFuncInHeader
@@ -250,7 +259,8 @@ const MySQLMemo = () => {
                 rowModelType="serverSide"
                 serverSideStoreType="partial"
                 cacheBlockSize={5}
-                frameworkComponents={{ customViewsToolPanel: ViewsToolPanel }}
+                components={components}
+                // frameworkComponents={{ customViewsToolPanel: ViewsToolPanel }}
                 // onFirstDataRendered={onFirstDataRendered}
 
                 // onFirstDataRendered={(params) => {

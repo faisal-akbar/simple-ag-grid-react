@@ -12,17 +12,17 @@ import { useFeature } from "../../context/featureContext";
 import { icons } from "../../lib/icons";
 import { sideBar } from "../../lib/sideBarConfig";
 import {
-    currencyFormatter,
-    numberFormatter,
-    numberParser,
-    percentFormatter
+  currencyFormatter,
+  numberFormatter,
+  numberParser,
+  percentFormatter
 } from "../../lib/utils";
 import { LOCAL_KEY_MYSQL_SOCKET } from "../../Workers/localConstants";
 import {
-    disconnectSocket,
-    initiateSocketConnection,
-    subscribeToInitialData,
-    subscribeToStreamData
+  disconnectSocket,
+  initiateSocketConnection,
+  subscribeToInitialData,
+  subscribeToStreamData
 } from "../../Workers/socketio.service";
 import PreLoader from "../PreLoader";
 import { ThemeContext } from "../Theme/ThemeContext";
@@ -30,6 +30,9 @@ import ViewsToolPanel from "../Views/ViewsToolPanel";
 import CustomAnimationRenderer from "./CustomAnimationRenderer";
 
 const SocketApp = () => {
+  const [components] = useState({
+    customViewsToolPanel: ViewsToolPanel,
+});
   const [gridApi, setGridApi] = useState(null);
   const [gridColumnApi, setGridColumnApi] = useState(null);
   const { theme } = useContext(ThemeContext);
@@ -161,14 +164,13 @@ const SocketApp = () => {
         // eslint-disable-next-line no-use-before-define
         filterParams: numberFilterParams,
         valueParser: numberParser,
-        chartType: "series",
+        chartDataType: "series",
         cellRenderer: "agAnimateShowChangeCellRenderer",
       },
       {
         headerName: "Order Date",
         field: "order_date",
         filter: "agDateColumnFilter",
-        filterType: "date",
         enableRowGroup: true,
         rowGroup: true,
         hide: true,
@@ -187,9 +189,9 @@ const SocketApp = () => {
         filterParams: numberFilterParams,
         valueParser: numberParser,
         valueFormatter: numberFormatter,
-        chartType: "series",
+        chartDataType: "series",
         // cellRenderer:"agAnimateShowChangeCellRenderer"
-        cellRendererFramework: CustomAnimationRenderer,
+        cellRenderer: CustomAnimationRenderer,
       },
       {
         headerName: "Discount",
@@ -200,7 +202,7 @@ const SocketApp = () => {
         filterParams: numberFilterParams,
         valueParser: numberParser,
         valueFormatter: percentFormatter,
-        chartType: "series",
+        chartDataType: "series",
         // cellRenderer:"agAnimateShowChangeCellRenderer"
         // cellRendererFramework: CustomAnimationRenderer,
       },
@@ -213,7 +215,7 @@ const SocketApp = () => {
         filter: "agNumberColumnFilter",
         filterParams: numberFilterParams,
         valueParser: numberParser,
-        chartType: "series",
+        chartDataType: "series",
         cellRenderer: "agAnimateShowChangeCellRenderer",
         // cellRendererFramework: CustomAnimationRenderer,
         // cellClassRules: {
@@ -264,7 +266,7 @@ const SocketApp = () => {
               },
             },
           }}
-          suppressHorizontalScroll
+          // suppressHorizontalScroll
           groupIncludeFooter
           groupIncludeTotalFooter
           suppressAggFuncInHeader
@@ -277,7 +279,8 @@ const SocketApp = () => {
           enableRangeSelection
           onGridReady={onGridReady}
           columnDefs={colDefs}
-          frameworkComponents={{ customViewsToolPanel: ViewsToolPanel }}
+          components={components}
+          // frameworkComponents={{ customViewsToolPanel: ViewsToolPanel }}
           // rowModelType="serverSide"
           // serverSideStoreType="partial"
           // cacheBlockSize={5}

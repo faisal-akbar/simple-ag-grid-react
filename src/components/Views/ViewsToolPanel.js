@@ -99,6 +99,7 @@ export default function ViewsToolPanel(props) {
             props.api.setFilterModel(obj.filterState);
         }
         if (obj.columnState) {
+            console.log(obj.columnState);
             props.columnApi.applyColumnState({
                 state: obj.columnState,
                 applyOrder: true,
@@ -128,6 +129,7 @@ export default function ViewsToolPanel(props) {
                 <ul className="list-none">
                     {views.map((view) => (
                         <ViewItem
+                            key={view.id}
                             view={view}
                             onLoad={onLoadFilterAndColumnState}
                             onEditClick={handleEditClick}

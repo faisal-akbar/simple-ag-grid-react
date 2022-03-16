@@ -2,13 +2,13 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-underscore-dangle */
 import React, {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  // eslint-disable-next-line prettier/prettier
-  useState
+    forwardRef,
+    useEffect,
+    useImperativeHandle,
+    useMemo,
+    useRef,
+    // eslint-disable-next-line prettier/prettier
+    useState
 } from 'react';
 
 const ARROW_UP = '\u2191';
